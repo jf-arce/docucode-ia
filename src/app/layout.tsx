@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { NavBar } from "@/components/NavBar";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -13,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Docucode IA",
-	description: "Document your code with AI, in a few seconds",
+	title: "DocuCode AI",
+	description: "Generate comprehensive documentation for your code automatically using AI",
 };
 
 export default function RootLayout({
@@ -23,8 +25,13 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+		<html lang="en" suppressHydrationWarning>
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+					<NavBar />
+					{children}
+				</ThemeProvider>
+			</body>
 		</html>
 	);
 }
