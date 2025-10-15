@@ -1,0 +1,6 @@
+build 
+node_modules
+.next
+out
+public
+*.d.ts
