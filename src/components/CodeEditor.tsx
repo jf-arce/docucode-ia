@@ -1,19 +1,33 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState } from "react";
+import AceEditor from "react-ace";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
 import { Spinner } from "./ui/spinner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./ui/select";
 
-import { EditorView, basicSetup } from "codemirror";
-import { EditorState, StateEffect } from "@codemirror/state";
-import { syntaxHighlighting, defaultHighlightStyle } from "@codemirror/language";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { java } from "@codemirror/lang-java";
-import { cpp } from "@codemirror/lang-cpp";
-import { oneDark } from "@codemirror/theme-one-dark";
+// Importar temas y lenguajes comunes
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/mode-java";
+import "ace-builds/src-noconflict/mode-c_cpp";
+import "ace-builds/src-noconflict/mode-typescript";
+import "ace-builds/src-noconflict/mode-csharp";
+import "ace-builds/src-noconflict/mode-golang";
+
+import "ace-builds/src-noconflict/theme-twilight";
+import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-dracula";
+import "ace-builds/src-noconflict/theme-solarized_dark";
+
 
 interface CodeEditorProps {
 	code: string;
@@ -24,25 +38,6 @@ interface CodeEditorProps {
 	isGenerating: boolean;
 }
 
-// Función para obtener la extensión del lenguaje
-const getLanguageExtension = (lang: string) => {
-	switch (lang) {
-		case "javascript":
-			return javascript();
-		case "typescript":
-			return javascript({ typescript: true });
-		case "python":
-			return python();
-		case "java":
-			return java();
-		case "csharp":
-		case "go":
-			return cpp();
-		default:
-			return javascript();
-	}
-};
-
 export function CodeEditor({
 	code,
 	setCode,
@@ -51,92 +46,46 @@ export function CodeEditor({
 	onGenerate,
 	isGenerating,
 }: CodeEditorProps) {
-	const editorRef = useRef<HTMLDivElement>(null);
-	const viewRef = useRef<EditorView | null>(null);
+	const [height] = useState("100%");
 
-	useEffect(() => {
-		if (!editorRef.current) return;
+	const handleChange = (value: string) => {
+		setCode(value);
+	};
 
-		// ⚙️ Configuración común de extensiones
-		const buildExtensions = () => [
-			basicSetup,
-			getLanguageExtension(language),
-			oneDark,
-			syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-			EditorView.updateListener.of((update) => {
-				if (update.docChanged) {
-					setCode(update.state.doc.toString());
-				}
-			}),
-			EditorView.theme({
-				"&": {
-					height: "100%",
-					backgroundColor: "transparent",
-				},
-				".cm-content": {
-					fontFamily: "monospace",
-					fontSize: "14px",
-					color: "hsl(var(--foreground))",
-				},
-				".cm-gutters": {
-					backgroundColor: "transparent",
-					borderRight: "1px solid hsl(var(--border))",
-				},
-			}),
-		];
-
-		// Si ya existe un editor → reconfiguramos
-		if (viewRef.current) {
-			viewRef.current.dispatch({
-				effects: StateEffect.reconfigure.of(buildExtensions()),
-			});
-			return;
-		}
-
-		// Si no existe → lo creamos
-		const state = EditorState.create({
-			doc: code,
-			extensions: buildExtensions(),
-		});
-
-		viewRef.current = new EditorView({
-			state,
-			parent: editorRef.current,
-		});
-
-		return () => {
-			viewRef.current?.destroy();
-			viewRef.current = null;
-		};
-	}, [language, setCode]);
-
-	// 🔄 Sincronizar código externo → editor
-	useEffect(() => {
-		if (viewRef.current && code !== viewRef.current.state.doc.toString()) {
-			const transaction = viewRef.current.state.update({
-				changes: { from: 0, to: viewRef.current.state.doc.length, insert: code },
-			});
-			viewRef.current.dispatch(transaction);
-		}
-	}, [code]);
+	const [theme, setTheme] = useState("dracula")
 
 	return (
 		<div className="flex w-1/2 flex-col border-r border-border">
 			{/* Encabezado */}
 			<div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
 				<div className="flex items-center gap-3">
-					<h2 className="font-mono text-sm font-medium text-foreground">Code Editor</h2>
+					<h2 className="font-mono text-sm font-medium text-foreground">
+						Code Editor
+					</h2>
 					<Select value={language} onValueChange={setLanguage}>
 						<SelectTrigger className="h-8 w-[140px] text-xs">
-							<SelectValue />
+							<SelectValue placeholder="Language" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="javascript">JavaScript</SelectItem>
 							<SelectItem value="typescript">TypeScript</SelectItem>
 							<SelectItem value="python">Python</SelectItem>
 							<SelectItem value="java">Java</SelectItem>
+							<SelectItem value="c_cpp">C / C++</SelectItem>
 							<SelectItem value="csharp">C#</SelectItem>
-							<SelectItem value="go">Go</SelectItem>
+							<SelectItem value="golang">Go</SelectItem>
+						</SelectContent>
+					</Select>
+					<Select value={theme} onValueChange={setTheme}>
+						<SelectTrigger className="h-8 w-[140px] text-xs">
+							Theme
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="twilight">Twilight</SelectItem>
+							<SelectItem value="github">Github</SelectItem>
+							<SelectItem value="dracula">Dracula</SelectItem>
+							<SelectItem value="solarized_dark">Solarized Dark</SelectItem>
+							<SelectItem value="monokai">Monokai</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -146,7 +95,12 @@ export function CodeEditor({
 						<Upload className="h-3.5 w-3.5" />
 						Upload
 					</Button>
-					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="h-8 gap-2">
+					<Button
+						onClick={onGenerate}
+						disabled={isGenerating}
+						size="sm"
+						className="h-8 gap-2"
+					>
 						{isGenerating ? (
 							<>
 								<Spinner className="h-3.5 w-3.5" />
@@ -162,8 +116,31 @@ export function CodeEditor({
 				</div>
 			</div>
 
-			{/* Área del editor */}
-			<div ref={editorRef} className="flex-1 overflow-auto bg-editor-bg" />
+			{/* Editor */}
+			<div className="flex-1 overflow-hidden">
+				<AceEditor
+					mode={language}
+					theme={theme}
+					name="code-editor"
+					value={code}
+					onChange={handleChange}
+					width="100%"
+					height={height}
+					fontSize={14}
+					showPrintMargin={false}
+					showGutter={true}
+					highlightActiveLine={true}
+					setOptions={{
+						useWorker: false,
+						tabSize: 2,
+						wrap: true,
+					}}
+					style={{
+						backgroundColor: "var(--background)",
+						color: "var(--foreground)",
+					}}
+				/>
+			</div>
 		</div>
 	);
 }
