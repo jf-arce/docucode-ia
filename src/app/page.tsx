@@ -4,6 +4,7 @@ import React from "react";
 import { CodeEditor } from "@/components/CodeEditor";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DocumentationPanel } from "@/components/DocumentationPanel";
 
 export default function Home() {
 	const [code, setCode] = useState<string>("");
@@ -47,6 +48,11 @@ export default function Home() {
 					language={language}
 					setLanguage={setLanguage}
 					onGenerate={handleGenerate}
+					isGenerating={isGenerating}
+				/>
+				<DocumentationPanel
+					documentation={documentation}
+					setDocumentation={setDocumentation}
 					isGenerating={isGenerating}
 				/>
 			</main>
