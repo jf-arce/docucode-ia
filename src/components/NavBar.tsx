@@ -95,7 +95,9 @@ export const NavBar = ({ user }: NavBarProps) => {
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>
 								<div className="flex flex-col gap-1">
-									<span className="text-sm font-medium">{user?.user_metadata.name}</span>
+									<span className="text-sm font-medium">
+										{user?.user_metadata.display_name || user?.user_metadata.name}
+									</span>
 									<span className="text-xs text-muted-foreground">{user?.email}</span>
 								</div>
 							</DropdownMenuLabel>
@@ -109,10 +111,10 @@ export const NavBar = ({ user }: NavBarProps) => {
 				) : (
 					<div className="flex items-center gap-2 pl-2">
 						<Button variant="outline" asChild>
-							<Link href="/auth/login?mode=signup">Signup</Link>
+							<Link href="/auth/login">Login</Link>
 						</Button>
 						<Button variant="default" asChild>
-							<Link href="/auth/login">Login</Link>
+							<Link href="/auth/login?mode=signup">Signup</Link>
 						</Button>
 					</div>
 				)}

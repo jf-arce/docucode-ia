@@ -2,16 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { toast } from "sonner";
 
-export const GoogleLoginButton = () => {
+export const GithubLoginButton = () => {
 	const supabase = createClient();
+	const { theme } = useTheme();
+	const githubIcon = theme === "dark" ? "/icons/github_dark.svg" : "/icons/github_light.svg";
 
 	const handleLogin = async () => {
-		toast.loading("Logging in with Google...");
+		toast.loading("Logging in with GitHub...");
 		await supabase.auth.signInWithOAuth({
-			provider: "google",
+			provider: "github",
 			options: {
 				redirectTo: `${location.origin}/auth/callback?next=/workspace`,
 			},
@@ -24,8 +27,10 @@ export const GoogleLoginButton = () => {
 			onClick={handleLogin}
 			className="w-full sm:w-auto flex flex-1 items-center justify-center gap-2"
 		>
-			<Image src="/icons/google.svg" alt="Google Icon" width={20} height={20} />
-			<span>Login with Google</span>
+			<picture>
+				<Image src={githubIcon} alt="GitHub Icon" width={20} height={20} />
+			</picture>
+			<span>Login with GitHub</span>
 		</Button>
 	);
 };

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NavBar } from "@/components/NavBar";
 import { createClient } from "@/utils/supabase/server";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default async function RootLayout({
 					<NavBar user={user?.user} />
 					<main className="min-h-[calc(100vh-56px)] flex flex-col flex-1">{children}</main>
 				</ThemeProvider>
+				<Toaster theme="dark" position="bottom-right" richColors />
 			</body>
 		</html>
 	);
