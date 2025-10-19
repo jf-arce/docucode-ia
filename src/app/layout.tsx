@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NavBar } from "@/components/NavBar";
+import { createClient } from "@/utils/supabase/server";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -19,17 +20,21 @@ export const metadata: Metadata = {
 	description: "Generate comprehensive documentation for your code automatically using AI",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const supabase = await createClient();
+
+	const { data: user } = await supabase.auth.getUser();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-					<NavBar />
-					{children}
+					<NavBar user={user?.user} />
+					<main className="min-h-[calc(100vh-56px)] flex flex-col flex-1">{children}</main>
 				</ThemeProvider>
 			</body>
 		</html>
