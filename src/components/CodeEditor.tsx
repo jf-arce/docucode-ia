@@ -5,13 +5,7 @@ import AceEditor from "react-ace";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
 import { Spinner } from "./ui/spinner";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 // Importar temas y lenguajes comunes
 import "ace-builds/src-noconflict/theme-monokai";
@@ -27,7 +21,6 @@ import "ace-builds/src-noconflict/theme-twilight";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-dracula";
 import "ace-builds/src-noconflict/theme-solarized_dark";
-
 
 interface CodeEditorProps {
 	code: string;
@@ -52,16 +45,14 @@ export function CodeEditor({
 		setCode(value);
 	};
 
-	const [theme, setTheme] = useState("dracula")
+	const [theme, setTheme] = useState("dracula");
 
 	return (
 		<div className="flex w-1/2 flex-col border-r border-border">
 			{/* Encabezado */}
 			<div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
 				<div className="flex items-center gap-3">
-					<h2 className="font-mono text-sm font-medium text-foreground">
-						Code Editor
-					</h2>
+					<h2 className="font-mono text-sm font-medium text-foreground">Code Editor</h2>
 					<Select value={language} onValueChange={setLanguage}>
 						<SelectTrigger className="h-8 w-[140px] text-xs">
 							<SelectValue placeholder="Language" />
@@ -77,9 +68,7 @@ export function CodeEditor({
 						</SelectContent>
 					</Select>
 					<Select value={theme} onValueChange={setTheme}>
-						<SelectTrigger className="h-8 w-[140px] text-xs">
-							Theme
-						</SelectTrigger>
+						<SelectTrigger className="h-8 w-[140px] text-xs">Theme</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="twilight">Twilight</SelectItem>
 							<SelectItem value="github">Github</SelectItem>
@@ -95,12 +84,7 @@ export function CodeEditor({
 						<Upload className="h-3.5 w-3.5" />
 						Upload
 					</Button>
-					<Button
-						onClick={onGenerate}
-						disabled={isGenerating}
-						size="sm"
-						className="h-8 gap-2"
-					>
+					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="h-8 gap-2">
 						{isGenerating ? (
 							<>
 								<Spinner className="h-3.5 w-3.5" />

@@ -2,19 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NavBar } from "@/components/NavBar";
-import { createClient } from "@/utils/supabase/server";
 import { Toaster } from "sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: "DocuCode AI",
@@ -26,16 +18,15 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const supabase = await createClient();
-
-	const { data: user } = await supabase.auth.getUser();
-
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-					<NavBar user={user?.user} />
-					<main className="min-h-[calc(100vh-56px)] flex flex-col flex-1">{children}</main>
+					<SidebarProvider>
+						<div className="flex flex-col flex-1 overflow-hidden">
+							<main className="min-h-[calc(100vh-56px)]">{children}</main>
+						</div>
+					</SidebarProvider>
 				</ThemeProvider>
 				<Toaster theme="dark" position="bottom-right" richColors />
 			</body>

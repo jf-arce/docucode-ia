@@ -39,8 +39,8 @@ export default function WorkspacePage() {
 	};
 
 	return (
-		<div className="flex h-screen flex-col">
-			<main className="flex flex-1 overflow-hidden">
+		<div className="flex h-full flex-col">
+			<div className="flex flex-1 overflow-hidden">
 				<CodeEditor
 					code={code}
 					setCode={setCode}
@@ -54,7 +54,7 @@ export default function WorkspacePage() {
 					setDocumentation={setDocumentation}
 					isGenerating={isGenerating}
 				/>
-			</main>
+			</div>
 		</div>
 	);
 }
