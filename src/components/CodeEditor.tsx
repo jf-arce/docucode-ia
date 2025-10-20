@@ -4,10 +4,8 @@ import { useState } from "react";
 import AceEditor from "react-ace";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
-import { Spinner } from "./ui/spinner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-// Importar temas y lenguajes comunes
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-python";
@@ -56,18 +54,11 @@ export function CodeEditor({
 						<Upload className="h-3.5 w-3.5" />
 						Upload
 					</Button>
-					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="min-w-[130px]">
-						{isGenerating ? (
-							<>
-								<Loader size={16} stroke={2} />
-								Generating...
-							</>
-						) : (
-							<>
-								<Sparkles />
-								Document
-							</>
-						)}
+					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="px-2.5">
+						<>
+							{isGenerating ? <Loader size={16} stroke={2} /> : <Sparkles className="h-4 w-4" />}
+							Document
+						</>
 					</Button>
 				</div>
 

@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Download, FileText, FileCode, Globe } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,6 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
+import { Loader2 } from "./Loader";
 
 interface DocumentationPanelProps {
 	documentation: string;
@@ -74,7 +74,7 @@ export function DocumentationPanel({
 				{isGenerating ? (
 					<div className="flex h-full items-center justify-center">
 						<div className="flex flex-col items-center gap-3">
-							<Spinner className="h-8 w-8 text-primary" />
+							<Loader2 size={40} stroke={2} speed={1} />
 							<p className="text-sm text-muted-foreground">Generating documentation...</p>
 						</div>
 					</div>
