@@ -4,6 +4,7 @@ import { Moon, Sun, Code2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const NavBar = () => {
 	const { theme, setTheme } = useTheme();
@@ -14,15 +15,9 @@ export const NavBar = () => {
 	}, []);
 
 	return (
-		<header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-			<div className="flex items-center gap-3">
-				<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-					<Code2 className="h-5 w-5 text-primary-foreground" />
-				</div>
-				<div>
-					<h1 className="font-mono text-lg font-semibold text-foreground">DocuCode AI</h1>
-				</div>
-			</div>
+		<header className="flex h-14 items-center justify-between border-b border-border bg-card px-2">
+
+			<SidebarTrigger />
 
 			<div className="flex items-center gap-2">
 				{mounted && (
