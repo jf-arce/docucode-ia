@@ -9,7 +9,7 @@ export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
-	const [language, setLanguage] = useState("javascript");
+	const [language, setLanguage] = useState("typescript");
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {

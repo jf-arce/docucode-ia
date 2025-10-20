@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AceEditor from "react-ace";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Loader } from "./Loader";
 
-import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/mode-html";
+import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/mode-java";
@@ -14,12 +16,34 @@ import "ace-builds/src-noconflict/mode-c_cpp";
 import "ace-builds/src-noconflict/mode-typescript";
 import "ace-builds/src-noconflict/mode-csharp";
 import "ace-builds/src-noconflict/mode-golang";
+import "ace-builds/src-noconflict/mode-rust";
+import "ace-builds/src-noconflict/mode-php";
+import "ace-builds/src-noconflict/mode-ruby";
+import "ace-builds/src-noconflict/mode-swift";
+import "ace-builds/src-noconflict/mode-kotlin";
+import "ace-builds/src-noconflict/mode-lua";
+import "ace-builds/src-noconflict/mode-sql";
+import "ace-builds/src-noconflict/mode-sh";
+import "ace-builds/src-noconflict/mode-yaml";
+import "ace-builds/src-noconflict/mode-json";
+import "ace-builds/src-noconflict/mode-xml";
+import "ace-builds/src-noconflict/mode-toml";
+import "ace-builds/src-noconflict/mode-dockerfile";
+import "ace-builds/src-noconflict/mode-markdown";
+import "ace-builds/src-noconflict/mode-tsx";
+import "ace-builds/src-noconflict/mode-jsx";
 
-import "ace-builds/src-noconflict/theme-twilight";
-import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-one_dark";
 import "ace-builds/src-noconflict/theme-dracula";
-import "ace-builds/src-noconflict/theme-solarized_dark";
-import { Loader } from "./Loader";
+import "ace-builds/src-noconflict/theme-twilight";
+import "ace-builds/src-noconflict/theme-monokai";
+
+import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-chrome";
+import "ace-builds/src-noconflict/theme-clouds";
+import "ace-builds/src-noconflict/theme-solarized_light";
+
+import { useTheme } from "next-themes";
 
 interface CodeEditorProps {
 	code: string;
@@ -29,6 +53,8 @@ interface CodeEditorProps {
 	onGenerate: () => void;
 	isGenerating: boolean;
 }
+
+const DEFAULT_THEME = "one_dark";
 
 export function CodeEditor({
 	code,
@@ -44,7 +70,12 @@ export function CodeEditor({
 		setCode(value);
 	};
 
-	const [theme, setTheme] = useState("dracula");
+	const currentTheme = useTheme();
+	const [theme, setTheme] = useState(currentTheme.theme === "dark" ? DEFAULT_THEME : "github");
+
+	useEffect(() => {
+		setTheme(currentTheme.theme === "dark" ? DEFAULT_THEME : "github");
+	}, [currentTheme.theme]);
 
 	return (
 		<div className="flex flex-col border-r border-border h-full">
@@ -67,30 +98,59 @@ export function CodeEditor({
 						<SelectTrigger className="h-8 text-xs">
 							<SelectValue placeholder="Language" />
 						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="javascript">JavaScript</SelectItem>
+						<SelectContent align="start">
 							<SelectItem value="typescript">TypeScript</SelectItem>
+							<SelectItem value="tsx">TSX</SelectItem>
+							<SelectItem value="javascript">JavaScript</SelectItem>
+							<SelectItem value="jsx">JSX</SelectItem>
 							<SelectItem value="python">Python</SelectItem>
 							<SelectItem value="java">Java</SelectItem>
 							<SelectItem value="c_cpp">C / C++</SelectItem>
 							<SelectItem value="csharp">C#</SelectItem>
 							<SelectItem value="golang">Go</SelectItem>
+							<SelectItem value="css">CSS</SelectItem>
+							<SelectItem value="html">HTML</SelectItem>
+							<SelectItem value="rust">Rust</SelectItem>
+							<SelectItem value="php">PHP</SelectItem>
+							<SelectItem value="ruby">Ruby</SelectItem>
+							<SelectItem value="swift">Swift</SelectItem>
+							<SelectItem value="kotlin">Kotlin</SelectItem>
+							<SelectItem value="lua">Lua</SelectItem>
+							<SelectItem value="sql">SQL</SelectItem>
+							<SelectItem value="sh">Shell</SelectItem>
+							<SelectItem value="yaml">YAML</SelectItem>
+							<SelectItem value="json">JSON</SelectItem>
+							<SelectItem value="xml">XML</SelectItem>
+							<SelectItem value="toml">TOML</SelectItem>
+							<SelectItem value="dockerfile">Dockerfile</SelectItem>
+							<SelectItem value="markdown">Markdown</SelectItem>
 						</SelectContent>
 					</Select>
+
 					<Select value={theme} onValueChange={setTheme}>
 						<SelectTrigger className="h-8 text-xs">Theme</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="twilight">Twilight</SelectItem>
-							<SelectItem value="github">Github</SelectItem>
-							<SelectItem value="dracula">Dracula</SelectItem>
-							<SelectItem value="solarized_dark">Solarized Dark</SelectItem>
-							<SelectItem value="monokai">Monokai</SelectItem>
+						<SelectContent align="start">
+							{currentTheme.theme === "dark" ? (
+								<>
+									<SelectItem value="one_dark">One Dark</SelectItem>
+									<SelectItem value="dracula">Dracula</SelectItem>
+									<SelectItem value="twilight">Twilight</SelectItem>
+									<SelectItem value="monokai">Monokai</SelectItem>
+								</>
+							) : (
+								<>
+									<SelectItem value="github">Github</SelectItem>
+									<SelectItem value="chrome">Chrome</SelectItem>
+									<SelectItem value="clouds">Clouds</SelectItem>
+									<SelectItem value="solarized_light">Solarized Light</SelectItem>
+								</>
+							)}
 						</SelectContent>
 					</Select>
 				</div>
 			</div>
 
-			<div className="flex-1 overflow-hidden">
+			<div className="flex-1 overflow-hidden custom-ace-editor">
 				<AceEditor
 					mode={language}
 					theme={theme}
