@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { ProjectsSidebar } from "@/components/ProjectsSidebar";
-// import { NavBar } from "@/components/NavBar";
+import { NavbarWorkspaceWrapper } from "@/components/NavbarWorkspaceWrapper";
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
 	const supabase = await createClient();
@@ -17,7 +17,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 				<ProjectsSidebar user={data?.user} />
 			</div>
 			<div className="flex-1 min-h-screen">
-				{/* <NavBar user={data?.user} /> */}
+				<NavbarWorkspaceWrapper user={data?.user} />
 				{children}
 			</div>
 		</div>

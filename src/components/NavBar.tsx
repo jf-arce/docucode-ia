@@ -18,7 +18,7 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-// import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface NavBarProps {
 	user: SupabaseUser | null;
@@ -48,7 +48,7 @@ export const NavBar = ({ user }: NavBarProps) => {
 	};
 
 	return (
-		<header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
+		<header className="flex h-14 items-center justify-between border-b border-border bg-card px-4 md:px-6">
 			{!isWorkspace && (
 				<div className="flex items-center gap-3">
 					<Link href="/" className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export const NavBar = ({ user }: NavBarProps) => {
 				</div>
 			)}
 
-			{/* {isWorkspace && <SidebarTrigger />} */}
+			{isWorkspace && <SidebarTrigger />}
 
 			<div className="flex items-center gap-2">
 				{user && !isWorkspace && (

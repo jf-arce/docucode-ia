@@ -40,20 +40,24 @@ export default function WorkspacePage() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<div className="flex flex-1 overflow-hidden">
-				<CodeEditor
-					code={code}
-					setCode={setCode}
-					language={language}
-					setLanguage={setLanguage}
-					onGenerate={handleGenerate}
-					isGenerating={isGenerating}
-				/>
-				<DocumentationPanel
-					documentation={documentation}
-					setDocumentation={setDocumentation}
-					isGenerating={isGenerating}
-				/>
+			<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
+				<div className="sm:w-1/2 h-full">
+					<CodeEditor
+						code={code}
+						setCode={setCode}
+						language={language}
+						setLanguage={setLanguage}
+						onGenerate={handleGenerate}
+						isGenerating={isGenerating}
+					/>
+				</div>
+				<div className="sm:w-1/2 h-full">
+					<DocumentationPanel
+						documentation={documentation}
+						setDocumentation={setDocumentation}
+						isGenerating={isGenerating}
+					/>
+				</div>
 			</div>
 		</div>
 	);

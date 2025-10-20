@@ -21,6 +21,7 @@ import "ace-builds/src-noconflict/theme-twilight";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-dracula";
 import "ace-builds/src-noconflict/theme-solarized_dark";
+import { Loader } from "./Loader";
 
 interface CodeEditorProps {
 	code: string;
@@ -48,13 +49,31 @@ export function CodeEditor({
 	const [theme, setTheme] = useState("dracula");
 
 	return (
-		<div className="flex w-1/2 flex-col border-r border-border">
-			{/* Encabezado */}
-			<div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
+		<div className="flex flex-col border-r border-border h-full">
+			<div className="min-h-[65px] flex flex-wrap gap-4 justify-between border-b border-border bg-card px-4 py-3">
+				<div className="flex items-center gap-2">
+					<Button variant="outline" size="sm" className="gap-2 bg-transparent">
+						<Upload className="h-3.5 w-3.5" />
+						Upload
+					</Button>
+					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="min-w-[130px]">
+						{isGenerating ? (
+							<>
+								<Loader size={16} stroke={2} />
+								Generating...
+							</>
+						) : (
+							<>
+								<Sparkles />
+								Document
+							</>
+						)}
+					</Button>
+				</div>
+
 				<div className="flex items-center gap-3">
-					<h2 className="font-mono text-sm font-medium text-foreground">Code Editor</h2>
 					<Select value={language} onValueChange={setLanguage}>
-						<SelectTrigger className="h-8 w-[140px] text-xs">
+						<SelectTrigger className="h-8 text-xs">
 							<SelectValue placeholder="Language" />
 						</SelectTrigger>
 						<SelectContent>
@@ -68,7 +87,7 @@ export function CodeEditor({
 						</SelectContent>
 					</Select>
 					<Select value={theme} onValueChange={setTheme}>
-						<SelectTrigger className="h-8 w-[140px] text-xs">Theme</SelectTrigger>
+						<SelectTrigger className="h-8 text-xs">Theme</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="twilight">Twilight</SelectItem>
 							<SelectItem value="github">Github</SelectItem>
@@ -78,29 +97,8 @@ export function CodeEditor({
 						</SelectContent>
 					</Select>
 				</div>
-
-				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" className="h-8 gap-2 bg-transparent">
-						<Upload className="h-3.5 w-3.5" />
-						Upload
-					</Button>
-					<Button onClick={onGenerate} disabled={isGenerating} size="sm" className="h-8 gap-2">
-						{isGenerating ? (
-							<>
-								<Spinner className="h-3.5 w-3.5" />
-								Generating...
-							</>
-						) : (
-							<>
-								<Sparkles className="h-3.5 w-3.5" />
-								Document
-							</>
-						)}
-					</Button>
-				</div>
 			</div>
 
-			{/* Editor */}
 			<div className="flex-1 overflow-hidden">
 				<AceEditor
 					mode={language}
@@ -109,6 +107,7 @@ export function CodeEditor({
 					value={code}
 					onChange={handleChange}
 					width="100%"
+					enableMobileMenu
 					height={height}
 					fontSize={14}
 					showPrintMargin={false}

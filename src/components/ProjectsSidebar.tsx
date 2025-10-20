@@ -50,6 +50,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Snippet = {
 	id: string;
@@ -70,6 +71,7 @@ export function ProjectsSidebar({ user }: { user: User }) {
 	const { toggleSidebar, open } = useSidebar();
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme } = useTheme();
+	const isMobile = useIsMobile();
 
 	useEffect(() => {
 		setMounted(true);
@@ -197,86 +199,91 @@ export function ProjectsSidebar({ user }: { user: User }) {
 				</SidebarGroup>
 			</SidebarContent>
 
-			<SidebarFooter>
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<SidebarMenuButton
-									size="lg"
-									className={`cursor-pointer ${open ? "justify-start" : "justify-center"}`}
+			{!isMobile && (
+				<SidebarFooter>
+					<SidebarMenu>
+						<SidebarMenuItem>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<SidebarMenuButton
+										size="lg"
+										className={`cursor-pointer ${open ? "justify-start" : "justify-center"}`}
+									>
+										<Avatar className={`${open ? "size-7" : "size-7"}`}>
+											<AvatarImage src={user?.user_metadata.avatar_url} />
+											<AvatarFallback>
+												<User2 className="h-4 w-4" />
+											</AvatarFallback>
+										</Avatar>
+
+										{open && (
+											<>
+												<span className="truncate ">
+													{user?.user_metadata.display_name || user?.user_metadata.name}{" "}
+												</span>
+												<ChevronUp className="ml-auto" />
+											</>
+										)}
+									</SidebarMenuButton>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									side="top"
+									style={{ width: "var(--radix-popper-anchor-width)" }}
 								>
-									<Avatar className={`${open ? "size-7" : "size-7"}`}>
-										<AvatarImage src={user?.user_metadata.avatar_url} />
-										<AvatarFallback>
-											<User2 className="h-4 w-4" />
-										</AvatarFallback>
-									</Avatar>
+									<DropdownMenuLabel>
+										<div className="flex gap-2 items-center">
+											{open && <User2 className="h-4 w-4 text-muted-foreground" />}
+											<span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+										</div>
+									</DropdownMenuLabel>
 
-									{open && (
-										<>
-											<span className="truncate ">
-												{user?.user_metadata.display_name || user?.user_metadata.name}{" "}
-											</span>
-											<ChevronUp className="ml-auto" />
-										</>
+									<DropdownMenuSeparator />
+
+									{mounted && (
+										<DropdownMenuItem asChild className="cursor-pointer">
+											<DropdownMenu>
+												<DropdownMenuTrigger asChild>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="relative w-full justify-start px-2"
+													>
+														{theme === "dark" && <Moon className="text-muted-foreground" />}
+														{theme === "light" && <Sun className="text-muted-foreground" />}
+														{theme === "system" && <Computer className="text-muted-foreground" />}
+
+														<span className="font-normal">Theme</span>
+													</Button>
+												</DropdownMenuTrigger>
+
+												<DropdownMenuContent align="end" side="right">
+													<DropdownMenuItem onClick={() => setTheme("light")}>
+														<Sun className="mr-2 h-4 w-4" />
+														<span>Light</span>
+													</DropdownMenuItem>
+													<DropdownMenuItem onClick={() => setTheme("dark")}>
+														<Moon className="mr-2 h-4 w-4" />
+														<span>Dark</span>
+													</DropdownMenuItem>
+													<DropdownMenuItem onClick={() => setTheme("system")}>
+														<Computer className="mr-2 h-4 w-4" />
+														<span>System</span>
+													</DropdownMenuItem>
+												</DropdownMenuContent>
+											</DropdownMenu>
+										</DropdownMenuItem>
 									)}
-								</SidebarMenuButton>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent side="top" style={{ width: "var(--radix-popper-anchor-width)" }}>
-								<DropdownMenuLabel>
-									<div className="flex gap-2 items-center">
-										{open && <User2 className="h-4 w-4 text-muted-foreground" />}
-										<span className="text-xs text-muted-foreground truncate">{user?.email}</span>
-									</div>
-								</DropdownMenuLabel>
 
-								<DropdownMenuSeparator />
-
-								{mounted && (
-									<DropdownMenuItem asChild className="cursor-pointer">
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="relative w-full justify-start px-2"
-												>
-													{theme === "dark" && <Moon className="text-muted-foreground" />}
-													{theme === "light" && <Sun className="text-muted-foreground" />}
-													{theme === "system" && <Computer className="text-muted-foreground" />}
-
-													<span className="font-normal">Theme</span>
-												</Button>
-											</DropdownMenuTrigger>
-
-											<DropdownMenuContent align="end" side="right">
-												<DropdownMenuItem onClick={() => setTheme("light")}>
-													<Sun className="mr-2 h-4 w-4" />
-													<span>Light</span>
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => setTheme("dark")}>
-													<Moon className="mr-2 h-4 w-4" />
-													<span>Dark</span>
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => setTheme("system")}>
-													<Computer className="mr-2 h-4 w-4" />
-													<span>System</span>
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
+									<DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+										<LogOut className="h-4 w-4" />
+										<span>Logout</span>
 									</DropdownMenuItem>
-								)}
-
-								<DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-									<LogOut className="h-4 w-4" />
-									<span>Logout</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarFooter>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarFooter>
+			)}
 		</Sidebar>
 	);
 }

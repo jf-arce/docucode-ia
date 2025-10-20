@@ -38,8 +38,8 @@ export function DocumentationPanel({
 	};
 
 	return (
-		<div className="flex w-1/2 flex-col">
-			<div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
+		<div className="flex flex-col h-full">
+			<div className="min-h-[65px] flex items-center justify-between border-b border-border bg-card px-4 py-3">
 				<h2 className="font-mono text-sm font-medium text-foreground">Generated Documentation</h2>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -70,7 +70,7 @@ export function DocumentationPanel({
 				</DropdownMenu>
 			</div>
 
-			<div className="flex-1 overflow-auto bg-editor-bg p-4">
+			<div className="flex-1 bg-editor-bg">
 				{isGenerating ? (
 					<div className="flex h-full items-center justify-center">
 						<div className="flex flex-col items-center gap-3">
@@ -82,7 +82,7 @@ export function DocumentationPanel({
 					<textarea
 						value={documentation}
 						onChange={(e) => setDocumentation(e.target.value)}
-						className="h-full w-full resize-none bg-transparent font-mono text-sm leading-relaxed text-foreground outline-none"
+						className="p-4 h-full w-full resize-none bg-transparent font-mono text-sm leading-relaxed text-foreground outline-none overflow-auto"
 						placeholder="Documentation will appear here..."
 						spellCheck={false}
 					/>
