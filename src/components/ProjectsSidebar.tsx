@@ -143,19 +143,18 @@ export function ProjectsSidebar() {
         <Sidebar collapsible="icon" className={`transition-all duration-300 ${collapsed ? "w-16" : "w-64"}`}>
             {/* HEADER */}
             <SidebarHeader>
-                <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                        <a className="flex items-center gap-2 cursor-pointer">
+                <SidebarMenuItem>
+                    <SidebarMenuButton className="p-0">
+                        <a className="flex items-center gap-2">
                             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                                <Code2 className="h-5 w-5 text-primary-foreground" />
+                                <Code2 className="h-5 text-primary-foreground" />
                             </span>
                             {!collapsed && (
                                 <span className="font-mono text-lg font-semibold">DocuCode AI</span>
                             )}
                         </a>
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
-                </CollapsibleTrigger>
+                </SidebarMenuItem>
                 {/* <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
