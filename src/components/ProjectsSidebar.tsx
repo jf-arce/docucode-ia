@@ -51,6 +51,20 @@ import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "./ui/dialog";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { createNewProjectAction } from "@/actions/newProjectForm.action";
+import { GetProjectDto } from "@/types/project.types";
 
 type Snippet = {
 	id: string;
@@ -65,7 +79,12 @@ type Project = {
 	snippets: Snippet[];
 };
 
-export function ProjectsSidebar({ user }: { user: User }) {
+interface ProjectsSidebarProps {
+	user: User;
+	userProjectsData: GetProjectDto[];
+}
+
+export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps) {
 	const [projects, setProjects] = useState<Project[]>([]);
 	const router = useRouter();
 	const { toggleSidebar, open } = useSidebar();
@@ -76,19 +95,6 @@ export function ProjectsSidebar({ user }: { user: User }) {
 	useEffect(() => {
 		setMounted(true);
 	}, []);
-
-	const handleCreateProject = () => {
-		const projectName = prompt("Nombre del nuevo proyecto:");
-		if (projectName && projectName.trim()) {
-			const newProject: Project = {
-				id: Date.now().toString(),
-				title: projectName.trim(),
-				icon: Folder,
-				snippets: [],
-			};
-			setProjects([...projects, newProject]);
-		}
-	};
 
 	const handleCreateSnippet = (projectId: string) => {
 		const snippetName = prompt("Nombre del nuevo snippet:");
@@ -154,32 +160,67 @@ export function ProjectsSidebar({ user }: { user: User }) {
 					<SidebarGroupContent>
 						<SidebarMenu>
 							<SidebarMenuItem>
-								<SidebarMenuButton onClick={handleCreateProject} tooltip="Nuevo Proyecto">
-									<Plus className="h-4 w-4" />
-									{open && <span>Nuevo Proyecto</span>}
-								</SidebarMenuButton>
+								<Dialog>
+									<DialogTrigger asChild>
+										<SidebarMenuButton tooltip="Nuevo Proyecto">
+											<>
+												<Plus className="h-4 w-4" />
+												<span>New Project</span>
+											</>
+										</SidebarMenuButton>
+									</DialogTrigger>
+
+									<DialogContent className="sm:max-w-[425px]">
+										<form>
+											<DialogHeader>
+												<DialogTitle>Create new project</DialogTitle>
+												<DialogDescription>Create your documentation project.</DialogDescription>
+											</DialogHeader>
+											<div className="grid gap-4">
+												<div className="grid gap-3">
+													<Label htmlFor="name">Name</Label>
+													<Input id="name" name="name" defaultValue="Documento 1" />
+												</div>
+												<div className="grid gap-3">
+													<Label htmlFor="description">Description</Label>
+													<Input id="description" name="description" defaultValue="Description" />
+												</div>
+											</div>
+											<DialogFooter>
+												<DialogClose asChild>
+													<Button variant="outline">Cancel</Button>
+												</DialogClose>
+												<DialogClose asChild>
+													<Button formAction={createNewProjectAction} type="submit">
+														Save changes
+													</Button>
+												</DialogClose>
+											</DialogFooter>
+										</form>
+									</DialogContent>
+								</Dialog>
 							</SidebarMenuItem>
 
-							{projects.map((project) => (
+							{userProjectsData.map((project) => (
 								<Collapsible key={project.id} asChild defaultOpen={false}>
 									<SidebarMenuItem>
 										<CollapsibleTrigger asChild>
-											<SidebarMenuButton tooltip={project.title}>
-												<project.icon />
-												{open && <span>{project.title}</span>}
+											<SidebarMenuButton tooltip={project.name}>
+												{/* <project.icon /> */}
+												{open && <span>{project.name}</span>}
 												<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
 											</SidebarMenuButton>
 										</CollapsibleTrigger>
 										<CollapsibleContent>
 											<SidebarMenuSub>
 												<SidebarMenuSubItem>
-													<SidebarMenuSubButton onClick={() => handleCreateSnippet(project.id)}>
+													{/* <SidebarMenuSubButton onClick={() => handleCreateSnippet(project.id)}>
 														<Plus className="h-4 w-4" />
-														{open && <span>Nuevo Snippet</span>}
-													</SidebarMenuSubButton>
+														{open && <span>New Snippet</span>}
+													</SidebarMenuSubButton> */}
 												</SidebarMenuSubItem>
 
-												{project.snippets.map((snippet) => (
+												{/* {project.snippets.map((snippet) => (
 													<SidebarMenuSubItem key={snippet.id}>
 														<SidebarMenuSubButton asChild>
 															<a href="#">
@@ -188,7 +229,7 @@ export function ProjectsSidebar({ user }: { user: User }) {
 															</a>
 														</SidebarMenuSubButton>
 													</SidebarMenuSubItem>
-												))}
+												))} */}
 											</SidebarMenuSub>
 										</CollapsibleContent>
 									</SidebarMenuItem>
