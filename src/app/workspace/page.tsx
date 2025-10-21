@@ -9,7 +9,6 @@ export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
-	const [language, setLanguage] = useState("typescript");
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -45,8 +44,6 @@ export default function WorkspacePage() {
 					<CodeEditor
 						code={code}
 						setCode={setCode}
-						language={language}
-						setLanguage={setLanguage}
 						onGenerate={handleGenerate}
 						isGenerating={isGenerating}
 					/>

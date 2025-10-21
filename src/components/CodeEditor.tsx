@@ -48,34 +48,35 @@ import { useTheme } from "next-themes";
 interface CodeEditorProps {
 	code: string;
 	setCode: (code: string) => void;
-	language: string;
-	setLanguage: (language: string) => void;
 	onGenerate: () => void;
 	isGenerating: boolean;
 }
 
 const DEFAULT_THEME = "one_dark";
+const DEFAULT_LANGUAGE = "typescript";
 
-export function CodeEditor({
-	code,
-	setCode,
-	language,
-	setLanguage,
-	onGenerate,
-	isGenerating,
-}: CodeEditorProps) {
+export function CodeEditor({ code, setCode, onGenerate, isGenerating }: CodeEditorProps) {
 	const [height] = useState("100%");
+	const currentTheme = useTheme();
+
+	const [codeEditorTheme, setCodeEditorTheme] = useState(() => {
+		return localStorage.getItem("editor-theme") || DEFAULT_THEME;
+	});
+	const [language, setLanguage] = useState(() => {
+		return localStorage.getItem("editor-language") || DEFAULT_LANGUAGE;
+	});
+
+	useEffect(() => {
+		localStorage.setItem("editor-language", language);
+	}, [language]);
+
+	useEffect(() => {
+		localStorage.setItem("editor-theme", codeEditorTheme);
+	}, [codeEditorTheme]);
 
 	const handleChange = (value: string) => {
 		setCode(value);
 	};
-
-	const currentTheme = useTheme();
-	const [theme, setTheme] = useState(currentTheme.theme === "dark" ? DEFAULT_THEME : "github");
-
-	useEffect(() => {
-		setTheme(currentTheme.theme === "dark" ? DEFAULT_THEME : "github");
-	}, [currentTheme.theme]);
 
 	return (
 		<div className="flex flex-col border-r border-border h-full">
@@ -127,7 +128,7 @@ export function CodeEditor({
 						</SelectContent>
 					</Select>
 
-					<Select value={theme} onValueChange={setTheme}>
+					<Select value={codeEditorTheme} onValueChange={setCodeEditorTheme}>
 						<SelectTrigger className="h-8 text-xs">Theme</SelectTrigger>
 						<SelectContent align="start">
 							{currentTheme.theme === "dark" ? (
@@ -153,7 +154,7 @@ export function CodeEditor({
 			<div className="flex-1 overflow-hidden custom-ace-editor">
 				<AceEditor
 					mode={language}
-					theme={theme}
+					theme={codeEditorTheme}
 					name="code-editor"
 					value={code}
 					onChange={handleChange}

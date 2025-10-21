@@ -38,9 +38,6 @@
 	--sidebar-ring: #7d7d7d;
 
 	--radius: 0.75rem;
-
-	--editor-bg: #fafafa;
-	--code-bg: #fafafa;
 }
 
 .dark {
@@ -78,9 +75,6 @@
 	--sidebar-ring: #7d7d7d;
 
 	--radius: 0.75rem;
-
-	--editor-bg: #131313;
-	--code-bg: #131313;
 }
 
 @theme inline {
