@@ -1,3 +1,5 @@
+import { Document } from "./document.types";
+
 export type Project = {
 	id: number;
 	created_at: string;
@@ -9,4 +11,6 @@ export type Project = {
 
 export type NewProjectDto = Omit<Project, "id" | "created_at" | "updated_at">;
 
-export type GetProjectDto = Omit<Project, "created_at" | "updated_at" | "userId">;
+export type GetProjectDto = Omit<Project, "created_at" | "updated_at" | "userId"> & {
+	documents: Document[];
+};

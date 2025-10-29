@@ -1,6 +1,6 @@
 "use server";
 
-import { createNewProjectData } from "@/data/createNewProject.data";
+import { createNewProjectData } from "@/data/project/createNewProject.data";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 

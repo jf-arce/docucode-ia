@@ -4,11 +4,13 @@ import { CodeEditor } from "@/components/CodeEditor";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
+import { useWorkspace } from "@/context/WorkspaceContext";
 
 export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
+	const { newDocument } = useWorkspace();
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -39,23 +41,31 @@ export default function WorkspacePage() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
-				<div className="sm:w-1/2 h-full">
-					<CodeEditor
-						code={code}
-						setCode={setCode}
-						onGenerate={handleGenerate}
-						isGenerating={isGenerating}
-					/>
+			{newDocument.document.title ? (
+				<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
+					<div className="sm:w-1/2 h-full">
+						<CodeEditor
+							code={code}
+							setCode={setCode}
+							onGenerate={handleGenerate}
+							isGenerating={isGenerating}
+						/>
+					</div>
+					<div className="sm:w-1/2 h-full">
+						<DocumentationPanel
+							documentation={documentation}
+							setDocumentation={setDocumentation}
+							isGenerating={isGenerating}
+						/>
+					</div>
 				</div>
-				<div className="sm:w-1/2 h-full">
-					<DocumentationPanel
-						documentation={documentation}
-						setDocumentation={setDocumentation}
-						isGenerating={isGenerating}
-					/>
+			) : (
+				<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
+					<div className="flex flex-1 items-center justify-center">
+						<p className="text-gray-500">Select or create a document to start coding.</p>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }
