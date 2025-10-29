@@ -65,6 +65,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { createNewProjectAction } from "@/actions/newProjectForm.action";
 import { GetProjectDto } from "@/types/project.types";
+import { useWorkspace } from "@/context/WorkspaceContext";
 
 type Snippet = {
 	id: string;
@@ -91,32 +92,33 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme } = useTheme();
 	const isMobile = useIsMobile();
+	const { newDocument, updateNewDocument } = useWorkspace();
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
 
-	const handleCreateSnippet = (projectId: string) => {
-		const snippetName = prompt("Nombre del nuevo snippet:");
-		if (snippetName && snippetName.trim()) {
-			setProjects(
-				projects.map((project) => {
-					if (project.id === projectId) {
-						const newSnippet: Snippet = {
-							id: Date.now().toString(),
-							title: snippetName.trim(),
-							icon: FileText,
-						};
-						return {
-							...project,
-							snippets: [...project.snippets, newSnippet],
-						};
-					}
-					return project;
-				}),
-			);
-		}
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const title = formData.get("title") as string;
+
+		// más adelante: llamada al backend con los datos de `newDocument`
+
+		// limpiar después de enviar
+		updateNewDocument({
+			snippet: {
+				lenguage: "",
+				code: "",
+			},
+			document: {
+				title: title,
+				project_id: 0,
+			},
+		});
 	};
+
+	console.log(newDocument);
 
 	const handleLogout = async () => {
 		await createClient()
@@ -162,7 +164,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 							<SidebarMenuItem>
 								<Dialog>
 									<DialogTrigger asChild>
-										<SidebarMenuButton tooltip="Nuevo Proyecto">
+										<SidebarMenuButton tooltip="New Project">
 											<>
 												<Plus className="h-4 w-4" />
 												<span>New Project</span>
@@ -179,7 +181,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 											<div className="grid gap-4">
 												<div className="grid gap-3">
 													<Label htmlFor="name">Name</Label>
-													<Input id="name" name="name" defaultValue="Documento 1" />
+													<Input id="name" name="name" defaultValue="Project 1" />
 												</div>
 												<div className="grid gap-3">
 													<Label htmlFor="description">Description</Label>
@@ -214,10 +216,39 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 										<CollapsibleContent>
 											<SidebarMenuSub>
 												<SidebarMenuSubItem>
-													{/* <SidebarMenuSubButton onClick={() => handleCreateSnippet(project.id)}>
-														<Plus className="h-4 w-4" />
-														{open && <span>New Snippet</span>}
-													</SidebarMenuSubButton> */}
+													<Dialog>
+														<DialogTrigger asChild>
+															<SidebarMenuButton tooltip="New Document">
+																<>
+																	<Plus className="h-4 w-4" />
+																	<span>New Document</span>
+																</>
+															</SidebarMenuButton>
+														</DialogTrigger>
+
+														<DialogContent className="sm:max-w-[425px]">
+															<form onSubmit={handleSubmit}>
+																<DialogHeader>
+																	<DialogTitle>Create new document</DialogTitle>
+																	<DialogDescription>Create your document file.</DialogDescription>
+																</DialogHeader>
+																<div className="grid gap-4">
+																	<div className="grid gap-3">
+																		<Label htmlFor="title">Title</Label>
+																		<Input id="title" name="title" placeholder="Document name" />
+																	</div>
+																</div>
+																<DialogFooter>
+																	<DialogClose asChild>
+																		<Button variant="outline">Cancel</Button>
+																	</DialogClose>
+																	<DialogClose asChild>
+																		<Button type="submit">Save changes</Button>
+																	</DialogClose>
+																</DialogFooter>
+															</form>
+														</DialogContent>
+													</Dialog>
 												</SidebarMenuSubItem>
 
 												{/* {project.snippets.map((snippet) => (
