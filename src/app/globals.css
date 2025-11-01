@@ -114,6 +114,7 @@
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
 	--font-serif: var(--font-serif);
+	--font-geist-mono: var(--font-geist-mono)
 }
 
 @layer base {
