@@ -1,14 +1,19 @@
 "use client";
 
 import { CodeEditor } from "@/components/CodeEditor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
+import Split from "react-split";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
+	const isMobile = useIsMobile();
+
+	useEffect(() => {}, [isMobile]);
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -39,8 +44,16 @@ export default function WorkspacePage() {
 
 	return (
 		<div className="flex h-full flex-col">
-			<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
-				<div className="sm:w-1/2 h-full">
+			{/* <div className="flex flex-col sm:flex-row flex-1 overflow-hidden"> */}
+			<Split
+				className="split w-full h-full flex flex-col"
+				sizes={[50, 50]}
+				direction={isMobile ? "vertical" : "horizontal"}
+				expandToMin={!isMobile}
+				minSize={100}
+				gutterSize={8}
+			>
+				<div className="h-full">
 					<CodeEditor
 						code={code}
 						setCode={setCode}
@@ -48,14 +61,15 @@ export default function WorkspacePage() {
 						isGenerating={isGenerating}
 					/>
 				</div>
-				<div className="sm:w-1/2 h-full">
+				<div className="h-full">
 					<DocumentationPanel
 						documentation={documentation}
 						setDocumentation={setDocumentation}
 						isGenerating={isGenerating}
 					/>
 				</div>
-			</div>
+			</Split>
+			{/* </div> */}
 		</div>
 	);
 }
