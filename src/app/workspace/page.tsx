@@ -1,7 +1,7 @@
 "use client";
 
 import { CodeEditor } from "@/components/CodeEditor";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
@@ -10,23 +10,7 @@ export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
-	const { newDocument, updateNewDocument } = useWorkspace();
-
-	// Configurar un documento de prueba si no hay ninguno
-	useEffect(() => {
-		if (!newDocument.document.title) {
-			updateNewDocument({
-				snippet: {
-					lenguage: "typescript",
-					code: "",
-				},
-				document: {
-					title: "Test Document",
-					project_id: 1,
-				},
-			});
-		}
-	}, []);
+	const { newDocument } = useWorkspace();
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -40,10 +24,8 @@ export default function WorkspacePage() {
 		setIsGenerating(true);
 
 		try {
-			// Obtener el lenguaje del editor desde localStorage
 			const language = localStorage.getItem("editor-language") || "typescript";
 
-			// Llamada a la API de generación de documentación
 			const response = await fetch("/api/generate-document", {
 				method: "POST",
 				headers: {
@@ -57,7 +39,7 @@ export default function WorkspacePage() {
 					document: {
 						title: newDocument.document.title,
 						project_id: newDocument.document.project_id,
-						language: "en", // o el idioma que prefieras
+						language: "en",
 					},
 				}),
 			});
@@ -73,13 +55,11 @@ export default function WorkspacePage() {
 
 			toast.success("Documentation generated and saved successfully", {
 				description: `Document ID: ${data.documentId}`,
-				duration: 4000,
 			});
 		} catch (error) {
 			console.error("Error generating documentation:", error);
 			toast.error("Failed to generate documentation", {
-				description: error instanceof Error ? error.message : "Please try again later.",
-				duration: 3000,
+				description: "Unable to generate the documentation at the moment. Please try again later.",
 			});
 		} finally {
 			setIsGenerating(false);
