@@ -2,8 +2,6 @@
 
 import {
 	ChevronRight,
-	Folder,
-	FileText,
 	Code2,
 	Plus,
 	PanelLeftIcon,
@@ -28,7 +26,6 @@ import {
 	SidebarMenuItem,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
-	SidebarMenuSubButton,
 	useSidebar,
 	SidebarTrigger,
 	SidebarFooter,
@@ -67,45 +64,28 @@ import { createNewProjectAction } from "@/actions/newProjectForm.action";
 import { GetProjectDto } from "@/types/project.types";
 import { useWorkspace } from "@/context/WorkspaceContext";
 
-type Snippet = {
-	id: string;
-	title: string;
-	icon: typeof FileText;
-};
-
-type Project = {
-	id: string;
-	title: string;
-	icon: typeof Folder;
-	snippets: Snippet[];
-};
-
 interface ProjectsSidebarProps {
 	user: User;
 	userProjectsData: GetProjectDto[];
 }
 
 export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps) {
-	const [projects, setProjects] = useState<Project[]>([]);
 	const router = useRouter();
 	const { toggleSidebar, open } = useSidebar();
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme } = useTheme();
 	const isMobile = useIsMobile();
-	const { newDocument, updateNewDocument } = useWorkspace();
+	const { updateNewDocument } = useWorkspace();
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = (e: React.FormEvent, projectId: number) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
 		const title = formData.get("title") as string;
 
-		// más adelante: llamada al backend con los datos de `newDocument`
-
-		// limpiar después de enviar
 		updateNewDocument({
 			snippet: {
 				lenguage: "",
@@ -113,12 +93,10 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 			},
 			document: {
 				title: title,
-				project_id: 0,
+				project_id: projectId,
 			},
 		});
 	};
-
-	console.log(newDocument);
 
 	const handleLogout = async () => {
 		await createClient()
@@ -227,7 +205,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 														</DialogTrigger>
 
 														<DialogContent className="sm:max-w-[425px]">
-															<form onSubmit={handleSubmit}>
+															<form onSubmit={(e) => handleSubmit(e, project.id)}>
 																<DialogHeader>
 																	<DialogTitle>Create new document</DialogTitle>
 																	<DialogDescription>Create your document file.</DialogDescription>
@@ -251,12 +229,12 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 													</Dialog>
 												</SidebarMenuSubItem>
 
-												{/* {project.snippets.map((snippet) => (
-													<SidebarMenuSubItem key={snippet.id}>
+												{/* {project.documents.map((document) => (
+													<SidebarMenuSubItem key={document.id}>
 														<SidebarMenuSubButton asChild>
 															<a href="#">
-																<snippet.icon />
-																{open && <span>{snippet.title}</span>}
+																<document.icon />
+																{open && <span>{document.title}</span>}
 															</a>
 														</SidebarMenuSubButton>
 													</SidebarMenuSubItem>

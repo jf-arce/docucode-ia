@@ -23,20 +23,47 @@ export default function WorkspacePage() {
 
 		setIsGenerating(true);
 
-		// [ ... Simulación del código de documentación ... ]
-		// ...
+		try {
+			const language = localStorage.getItem("editor-language") || "typescript";
 
-		// Simulación de la llamada a la API
-		setTimeout(() => {
-			const generatedDocs = `# Code Documentation ...`;
-
-			setDocumentation(generatedDocs);
-			setIsGenerating(false);
-
-			toast.success("Documentation generated successfully", {
-				duration: 3000,
+			const response = await fetch("/api/generate-document", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					snippet: {
+						language: language,
+						code: code,
+					},
+					document: {
+						title: newDocument.document.title,
+						project_id: newDocument.document.project_id,
+						language: "en",
+					},
+				}),
 			});
-		}, 2000);
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Failed to generate documentation");
+			}
+
+			const data = await response.json();
+
+			setDocumentation(data.document);
+
+			toast.success("Documentation generated and saved successfully", {
+				description: `Document ID: ${data.documentId}`,
+			});
+		} catch (error) {
+			console.error("Error generating documentation:", error);
+			toast.error("Failed to generate documentation", {
+				description: "Unable to generate the documentation at the moment. Please try again later.",
+			});
+		} finally {
+			setIsGenerating(false);
+		}
 	};
 
 	return (
