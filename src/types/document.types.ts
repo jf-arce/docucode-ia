@@ -1,3 +1,9 @@
+export interface Snippet {
+	id: number;
+	code: string;
+	lenguage: string;
+}
+
 export interface Document {
 	id: number;
 	created_at: string;
@@ -5,6 +11,7 @@ export interface Document {
 	content: string;
 	project_id: number;
 	snippet_id: number;
+	snippet?: Snippet;
 }
 
 export type GetDocumentDto = Omit<Document, "created_at" | "snippet_id">;

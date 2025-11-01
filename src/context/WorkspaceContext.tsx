@@ -3,15 +3,24 @@
 import { GenerateDocumentationDto } from "@/types/document.types";
 import { createContext, useContext, useState, ReactNode } from "react";
 
+interface DocumentState extends GenerateDocumentationDto {
+	document: {
+		id?: number;
+		title: string;
+		project_id: number;
+		content?: string;
+	};
+}
+
 interface WorkspaceState {
-	newDocument: GenerateDocumentationDto;
-	updateNewDocument: (doc: GenerateDocumentationDto) => void;
+	newDocument: DocumentState;
+	updateNewDocument: (doc: DocumentState) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceState | undefined>(undefined);
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-	const [newDocument, setNewDocument] = useState({
+	const [newDocument, setNewDocument] = useState<DocumentState>({
 		snippet: {
 			lenguage: "",
 			code: "",
@@ -21,7 +30,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 			project_id: 0,
 		},
 	});
-	const updateNewDocument = (doc: GenerateDocumentationDto) => {
+	const updateNewDocument = (doc: DocumentState) => {
 		setNewDocument(doc);
 	};
 

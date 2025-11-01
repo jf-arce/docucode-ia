@@ -13,6 +13,8 @@ import {
 	Sun,
 	Moon,
 	Computer,
+	Trash2,
+	MoreVertical,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -64,8 +66,22 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { createNewProjectAction } from "@/actions/newProjectForm.action";
+import { createDocumentAction } from "@/actions/createDocument.action";
+import { deleteDocumentAction } from "@/actions/deleteDocument.action";
+import { deleteProjectAction } from "@/actions/deleteProject.action";
 import { GetProjectDto } from "@/types/project.types";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { toast } from "sonner";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 type Snippet = {
 	id: string;
@@ -93,32 +109,154 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 	const { theme, setTheme } = useTheme();
 	const isMobile = useIsMobile();
 	const { newDocument, updateNewDocument } = useWorkspace();
+	const [isDialogOpen, setIsDialogOpen] = useState<{ [key: number]: boolean }>({});
+	const [deleteProjectId, setDeleteProjectId] = useState<number | null>(null);
+	const [deleteDocumentId, setDeleteDocumentId] = useState<number | null>(null);
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent, projectId: number) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
 		const title = formData.get("title") as string;
 
-		// más adelante: llamada al backend con los datos de `newDocument`
+		if (!title.trim()) {
+			toast.error("Title required", {
+				description: "Please enter a document title.",
+				duration: 3000,
+			});
+			return;
+		}
 
-		// limpiar después de enviar
-		updateNewDocument({
-			snippet: {
-				lenguage: "",
-				code: "",
-			},
-			document: {
-				title: title,
-				project_id: 0,
-			},
-		});
+		// Cerrar el diálogo inmediatamente
+		setIsDialogOpen({ ...isDialogOpen, [projectId]: false });
+
+		// Mostrar toast de carga
+		toast.loading("Creating document...", { id: "create-doc" });
+
+		try {
+			// Crear el documento en la base de datos
+			const result = await createDocumentAction(title, projectId);
+
+			if (!result.success) {
+				throw new Error(result.error || "Failed to create document");
+			}
+
+			// Actualizar el contexto con el nuevo documento
+			updateNewDocument({
+				snippet: {
+					lenguage: "typescript",
+					code: "",
+				},
+				document: {
+					title: title,
+					project_id: projectId,
+				},
+			});
+
+			// Cerrar el toast de carga y mostrar éxito
+			toast.success("Document created", {
+				id: "create-doc",
+				description: `"${title}" is ready to be edited.`,
+				duration: 3000,
+			});
+
+			// Refrescar los datos del servidor para actualizar la lista de documentos
+			router.refresh();
+
+			// Si es móvil, cerrar el sidebar
+			if (isMobile) {
+				toggleSidebar();
+			}
+		} catch (error) {
+			console.error("Error creating document:", error);
+			toast.error("Failed to create document", {
+				id: "create-doc",
+				description: error instanceof Error ? error.message : "Please try again.",
+				duration: 3000,
+			});
+		}
 	};
 
-	console.log(newDocument);
+	const handleDeleteProject = async () => {
+		if (!deleteProjectId) return;
+
+		toast.loading("Deleting project...", { id: "delete-project" });
+
+		try {
+			const result = await deleteProjectAction(deleteProjectId);
+
+			if (!result.success) {
+				throw new Error(result.error || "Failed to delete project");
+			}
+
+			toast.success("Project deleted", {
+				id: "delete-project",
+				description: "Project and all its documents have been deleted.",
+				duration: 3000,
+			});
+
+			// Si el proyecto eliminado contenía el documento actual, limpiar el contexto
+			if (newDocument.document.project_id === deleteProjectId) {
+				updateNewDocument({
+					snippet: { lenguage: "", code: "" },
+					document: { title: "", project_id: 0 },
+				});
+			}
+
+			router.refresh();
+		} catch (error) {
+			console.error("Error deleting project:", error);
+			toast.error("Failed to delete project", {
+				id: "delete-project",
+				description: error instanceof Error ? error.message : "Please try again.",
+				duration: 3000,
+			});
+		} finally {
+			setDeleteProjectId(null);
+		}
+	};
+
+	const handleDeleteDocument = async () => {
+		if (!deleteDocumentId) return;
+
+		toast.loading("Deleting document...", { id: "delete-document" });
+
+		try {
+			const result = await deleteDocumentAction(deleteDocumentId);
+
+			if (!result.success) {
+				throw new Error(result.error || "Failed to delete document");
+			}
+
+			toast.success("Document deleted", {
+				id: "delete-document",
+				description: "Document has been deleted.",
+				duration: 3000,
+			});
+
+			// Si el documento eliminado es el actual, limpiar el contexto
+			if (newDocument.document.id === deleteDocumentId) {
+				updateNewDocument({
+					snippet: { lenguage: "", code: "" },
+					document: { title: "", project_id: 0 },
+				});
+			}
+
+			router.refresh();
+		} catch (error) {
+			console.error("Error deleting document:", error);
+			toast.error("Failed to delete document", {
+				id: "delete-document",
+				description: error instanceof Error ? error.message : "Please try again.",
+				duration: 3000,
+			});
+		} finally {
+			setDeleteDocumentId(null);
+		}
+	};
 
 	const handleLogout = async () => {
 		await createClient()
@@ -206,17 +344,43 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 							{userProjectsData.map((project) => (
 								<Collapsible key={project.id} asChild defaultOpen={false}>
 									<SidebarMenuItem>
-										<CollapsibleTrigger asChild>
-											<SidebarMenuButton tooltip={project.name}>
-												{/* <project.icon /> */}
-												{open && <span>{project.name}</span>}
-												<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-											</SidebarMenuButton>
-										</CollapsibleTrigger>
+										<div className="flex items-center w-full group/project">
+											<CollapsibleTrigger asChild>
+												<SidebarMenuButton tooltip={project.name} className="flex-1">
+													{open && <span>{project.name}</span>}
+													<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+												</SidebarMenuButton>
+											</CollapsibleTrigger>
+											{open && (
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button
+															variant="ghost"
+															size="sm"
+															className="h-8 w-8 p-0 opacity-0 group-hover/project:opacity-100 transition-opacity"
+														>
+															<MoreVertical className="h-4 w-4" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end">
+														<DropdownMenuItem
+															onClick={() => setDeleteProjectId(project.id)}
+															className="text-destructive focus:text-destructive"
+														>
+															<Trash2 className="mr-2 h-4 w-4" />
+															Delete Project
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											)}
+										</div>
 										<CollapsibleContent>
 											<SidebarMenuSub>
 												<SidebarMenuSubItem>
-													<Dialog>
+													<Dialog
+														open={isDialogOpen[project.id] ?? false}
+														onOpenChange={(open) => setIsDialogOpen({ ...isDialogOpen, [project.id]: open })}
+													>
 														<DialogTrigger asChild>
 															<SidebarMenuButton tooltip="New Document">
 																<>
@@ -227,40 +391,86 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 														</DialogTrigger>
 
 														<DialogContent className="sm:max-w-[425px]">
-															<form onSubmit={handleSubmit}>
+															<form onSubmit={(e) => handleSubmit(e, project.id)}>
 																<DialogHeader>
 																	<DialogTitle>Create new document</DialogTitle>
-																	<DialogDescription>Create your document file.</DialogDescription>
+																	<DialogDescription>
+																		Create a new document in {project.name}
+																	</DialogDescription>
 																</DialogHeader>
 																<div className="grid gap-4">
 																	<div className="grid gap-3">
 																		<Label htmlFor="title">Title</Label>
-																		<Input id="title" name="title" placeholder="Document name" />
+																		<Input
+																			id="title"
+																			name="title"
+																			placeholder="Document name"
+																			autoFocus
+																		/>
 																	</div>
 																</div>
 																<DialogFooter>
-																	<DialogClose asChild>
-																		<Button variant="outline">Cancel</Button>
-																	</DialogClose>
-																	<DialogClose asChild>
-																		<Button type="submit">Save changes</Button>
-																	</DialogClose>
+																	<Button
+																		variant="outline"
+																		type="button"
+																		onClick={() => setIsDialogOpen({ ...isDialogOpen, [project.id]: false })}
+																	>
+																		Cancel
+																	</Button>
+																	<Button type="submit">Create Document</Button>
 																</DialogFooter>
 															</form>
 														</DialogContent>
 													</Dialog>
 												</SidebarMenuSubItem>
 
-												{/* {project.snippets.map((snippet) => (
-													<SidebarMenuSubItem key={snippet.id}>
-														<SidebarMenuSubButton asChild>
-															<a href="#">
-																<snippet.icon />
-																{open && <span>{snippet.title}</span>}
-															</a>
-														</SidebarMenuSubButton>
-													</SidebarMenuSubItem>
-												))} */}
+												{project.documents && project.documents.length > 0 && (
+													project.documents.map((document) => (
+														<SidebarMenuSubItem key={document.id}>
+															<div className="flex items-center w-full group/document">
+																<SidebarMenuSubButton
+																	asChild
+																	className="flex-1"
+																	onClick={() => {
+																		updateNewDocument({
+																			snippet: {
+																				lenguage: document.snippet?.lenguage || "typescript",
+																				code: document.snippet?.code || "",
+																			},
+																			document: {
+																				id: document.id,
+																				title: document.title,
+																				project_id: project.id,
+																				content: document.content || "",
+																			},
+																		});
+																		if (isMobile) {
+																			toggleSidebar();
+																		}
+																	}}
+																>
+																	<div className="flex items-center gap-2 cursor-pointer w-full">
+																		<FileText className="h-4 w-4 flex-shrink-0" />
+																		{open && <span className="truncate">{document.title}</span>}
+																	</div>
+																</SidebarMenuSubButton>
+																{open && (
+																	<Button
+																		variant="ghost"
+																		size="sm"
+																		className="h-6 w-6 p-0 opacity-0 group-hover/document:opacity-100 transition-opacity flex-shrink-0"
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			setDeleteDocumentId(document.id);
+																		}}
+																	>
+																		<Trash2 className="h-3 w-3 text-destructive" />
+																	</Button>
+																)}
+															</div>
+														</SidebarMenuSubItem>
+													))
+												)}
 											</SidebarMenuSub>
 										</CollapsibleContent>
 									</SidebarMenuItem>
@@ -356,6 +566,49 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 					</SidebarMenu>
 				</SidebarFooter>
 			)}
+
+			{/* Alert Dialog para eliminar proyecto */}
+			<AlertDialog open={deleteProjectId !== null} onOpenChange={() => setDeleteProjectId(null)}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete Project</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete this project? This will permanently delete the
+							project and all of its documents. This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDeleteProject}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			{/* Alert Dialog para eliminar documento */}
+			<AlertDialog open={deleteDocumentId !== null} onOpenChange={() => setDeleteDocumentId(null)}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete Document</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete this document? This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDeleteDocument}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</Sidebar>
 	);
 }
