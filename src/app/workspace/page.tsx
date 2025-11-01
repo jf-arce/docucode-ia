@@ -1,7 +1,7 @@
 "use client";
 
 import { CodeEditor } from "@/components/CodeEditor";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
@@ -10,7 +10,23 @@ export default function WorkspacePage() {
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
-	const { newDocument } = useWorkspace();
+	const { newDocument, updateNewDocument } = useWorkspace();
+
+	// Configurar un documento de prueba si no hay ninguno
+	useEffect(() => {
+		if (!newDocument.document.title) {
+			updateNewDocument({
+				snippet: {
+					lenguage: "typescript",
+					code: "",
+				},
+				document: {
+					title: "Test Document",
+					project_id: 1,
+				},
+			});
+		}
+	}, []);
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -23,20 +39,51 @@ export default function WorkspacePage() {
 
 		setIsGenerating(true);
 
-		// [ ... Simulación del código de documentación ... ]
-		// ...
+		try {
+			// Obtener el lenguaje del editor desde localStorage
+			const language = localStorage.getItem("editor-language") || "typescript";
 
-		// Simulación de la llamada a la API
-		setTimeout(() => {
-			const generatedDocs = `# Code Documentation ...`;
+			// Llamada a la API de generación de documentación
+			const response = await fetch("/api/generate-document", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					snippet: {
+						language: language,
+						code: code,
+					},
+					document: {
+						title: newDocument.document.title,
+						project_id: newDocument.document.project_id,
+						language: "en", // o el idioma que prefieras
+					},
+				}),
+			});
 
-			setDocumentation(generatedDocs);
-			setIsGenerating(false);
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Failed to generate documentation");
+			}
 
-			toast.success("Documentation generated successfully", {
+			const data = await response.json();
+
+			setDocumentation(data.document);
+
+			toast.success("Documentation generated and saved successfully", {
+				description: `Document ID: ${data.documentId}`,
+				duration: 4000,
+			});
+		} catch (error) {
+			console.error("Error generating documentation:", error);
+			toast.error("Failed to generate documentation", {
+				description: error instanceof Error ? error.message : "Please try again later.",
 				duration: 3000,
 			});
-		}, 2000);
+		} finally {
+			setIsGenerating(false);
+		}
 	};
 
 	return (
