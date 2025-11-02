@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 	const { language, code } = snippet;
 	const { title, project_id, language: docLanguage } = document;
 
-	if (!language || !code || !title || !project_id) {
+	if (language || !code || !title || !project_id) {
 		return Response.json(
 			{
 				message: "Missing required fields",
@@ -29,11 +29,9 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
-
 	try {
 		const supabase = await createClient();
 
-		// Verificar que el usuario esté autenticado
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
@@ -47,10 +45,6 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		console.log("User authenticated:", user.id);
-		console.log("Generating documentation for:", { language, title, project_id });
-
-		// Generar la documentación con IA
 		const { text: documentation } = await generateText({
 			model,
 			messages: [
@@ -77,10 +71,6 @@ export async function POST(req: NextRequest) {
 			],
 		});
 
-		console.log("Documentation generated successfully");
-
-		// 1. Guardar el snippet de código
-		console.log("Inserting snippet...");
 		const { data: snippetData, error: snippetError } = await supabase
 			.from("snippets")
 			.insert({
@@ -91,14 +81,9 @@ export async function POST(req: NextRequest) {
 			.single();
 
 		if (snippetError) {
-			console.error("Error saving snippet:", snippetError);
 			throw new Error(`Snippet error: ${snippetError.message}`);
 		}
 
-		console.log("Snippet saved:", snippetData.id);
-
-		// 2. Guardar el documento con la documentación generada
-		console.log("Inserting document...");
 		const { data: documentData, error: documentError } = await supabase
 			.from("documents")
 			.insert({
@@ -111,11 +96,8 @@ export async function POST(req: NextRequest) {
 			.single();
 
 		if (documentError) {
-			console.error("Error saving document:", documentError);
 			throw new Error(`Document error: ${documentError.message}`);
 		}
-
-		console.log("Document saved:", documentData.id);
 
 		return Response.json({
 			message: "Document generated and saved successfully",
@@ -123,7 +105,6 @@ export async function POST(req: NextRequest) {
 			documentId: documentData.id,
 		});
 	} catch (error) {
-		console.error("Error in generate-document:", error);
 		return Response.json(
 			{
 				message: "Internal server error",

@@ -2,8 +2,6 @@
 
 import {
 	ChevronRight,
-	Folder,
-	FileText,
 	Code2,
 	Plus,
 	PanelLeftIcon,
@@ -15,6 +13,7 @@ import {
 	Computer,
 	Trash2,
 	MoreVertical,
+	FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -30,7 +29,6 @@ import {
 	SidebarMenuItem,
 	SidebarMenuSub,
 	SidebarMenuSubItem,
-	SidebarMenuSubButton,
 	useSidebar,
 	SidebarTrigger,
 	SidebarFooter,
@@ -66,7 +64,6 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { createNewProjectAction } from "@/actions/newProjectForm.action";
-import { createDocumentAction } from "@/actions/createDocument.action";
 import { deleteDocumentAction } from "@/actions/deleteDocument.action";
 import { deleteProjectAction } from "@/actions/deleteProject.action";
 import { GetProjectDto } from "@/types/project.types";
@@ -83,26 +80,12 @@ import {
 	AlertDialogTitle,
 } from "./ui/alert-dialog";
 
-type Snippet = {
-	id: string;
-	title: string;
-	icon: typeof FileText;
-};
-
-type Project = {
-	id: string;
-	title: string;
-	icon: typeof Folder;
-	snippets: Snippet[];
-};
-
 interface ProjectsSidebarProps {
 	user: User;
 	userProjectsData: GetProjectDto[];
 }
 
 export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps) {
-	const [projects, setProjects] = useState<Project[]>([]);
 	const router = useRouter();
 	const { toggleSidebar, open } = useSidebar();
 	const [mounted, setMounted] = useState(false);
@@ -117,6 +100,17 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 		setMounted(true);
 	}, []);
 
+	// Refrescar la página cuando se guarda un documento
+	useEffect(() => {
+		if (newDocument.document.id && newDocument.document.title && typeof window !== "undefined") {
+			const timeoutId = setTimeout(() => {
+				router.refresh();
+			}, 500);
+
+			return () => clearTimeout(timeoutId);
+		}
+	}, [newDocument.document.id, newDocument.document.title, router]);
+
 	const handleSubmit = async (e: React.FormEvent, projectId: number) => {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
@@ -130,53 +124,23 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 			return;
 		}
 
-		// Cerrar el diálogo inmediatamente
+		const codeLenguage = localStorage.getItem("editor-language") || "typescript";
+		updateNewDocument({
+			snippet: {
+				language: codeLenguage,
+				code: "",
+			},
+			document: {
+				title: title,
+				project_id: projectId,
+				content: "",
+			},
+		});
+
 		setIsDialogOpen({ ...isDialogOpen, [projectId]: false });
 
-		// Mostrar toast de carga
-		toast.loading("Creating document...", { id: "create-doc" });
-
-		try {
-			// Crear el documento en la base de datos
-			const result = await createDocumentAction(title, projectId);
-
-			if (!result.success) {
-				throw new Error(result.error || "Failed to create document");
-			}
-
-			// Actualizar el contexto con el nuevo documento
-			updateNewDocument({
-				snippet: {
-					lenguage: "typescript",
-					code: "",
-				},
-				document: {
-					title: title,
-					project_id: projectId,
-				},
-			});
-
-			// Cerrar el toast de carga y mostrar éxito
-			toast.success("Document created", {
-				id: "create-doc",
-				description: `"${title}" is ready to be edited.`,
-				duration: 3000,
-			});
-
-			// Refrescar los datos del servidor para actualizar la lista de documentos
-			router.refresh();
-
-			// Si es móvil, cerrar el sidebar
-			if (isMobile) {
-				toggleSidebar();
-			}
-		} catch (error) {
-			console.error("Error creating document:", error);
-			toast.error("Failed to create document", {
-				id: "create-doc",
-				description: error instanceof Error ? error.message : "Please try again.",
-				duration: 3000,
-			});
+		if (isMobile) {
+			toggleSidebar();
 		}
 	};
 
@@ -201,7 +165,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 			// Si el proyecto eliminado contenía el documento actual, limpiar el contexto
 			if (newDocument.document.project_id === deleteProjectId) {
 				updateNewDocument({
-					snippet: { lenguage: "", code: "" },
+					snippet: { language: "", code: "" },
 					document: { title: "", project_id: 0 },
 				});
 			}
@@ -237,10 +201,10 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 				duration: 3000,
 			});
 
-			// Si el documento eliminado es el actual, limpiar el contexto
+			// Si el documento eliminado es el documento actual, limpiar el contexto
 			if (newDocument.document.id === deleteDocumentId) {
 				updateNewDocument({
-					snippet: { lenguage: "", code: "" },
+					snippet: { language: "", code: "" },
 					document: { title: "", project_id: 0 },
 				});
 			}
@@ -379,7 +343,9 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 												<SidebarMenuSubItem>
 													<Dialog
 														open={isDialogOpen[project.id] ?? false}
-														onOpenChange={(open) => setIsDialogOpen({ ...isDialogOpen, [project.id]: open })}
+														onOpenChange={(open) =>
+															setIsDialogOpen({ ...isDialogOpen, [project.id]: open })
+														}
 													>
 														<DialogTrigger asChild>
 															<SidebarMenuButton tooltip="New Document">
@@ -413,7 +379,9 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 																	<Button
 																		variant="outline"
 																		type="button"
-																		onClick={() => setIsDialogOpen({ ...isDialogOpen, [project.id]: false })}
+																		onClick={() =>
+																			setIsDialogOpen({ ...isDialogOpen, [project.id]: false })
+																		}
 																	>
 																		Cancel
 																	</Button>
@@ -424,17 +392,22 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 													</Dialog>
 												</SidebarMenuSubItem>
 
-												{project.documents && project.documents.length > 0 && (
+												{project.documents &&
+													project.documents.length > 0 &&
 													project.documents.map((document) => (
 														<SidebarMenuSubItem key={document.id}>
-															<div className="flex items-center w-full group/document">
-																<SidebarMenuSubButton
+															<div className="flex items-center w-full group/document gap-3">
+																<SidebarMenuButton
 																	asChild
-																	className="flex-1"
+																	className={`flex-1 ${
+																		newDocument.document.id === document.id
+																			? "bg-accent text-accent-foreground"
+																			: ""
+																	}`}
 																	onClick={() => {
 																		updateNewDocument({
 																			snippet: {
-																				lenguage: document.snippet?.lenguage || "typescript",
+																				language: document.snippet?.lenguage || "typescript",
 																				code: document.snippet?.code || "",
 																			},
 																			document: {
@@ -453,7 +426,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 																		<FileText className="h-4 w-4 flex-shrink-0" />
 																		{open && <span className="truncate">{document.title}</span>}
 																	</div>
-																</SidebarMenuSubButton>
+																</SidebarMenuButton>
 																{open && (
 																	<Button
 																		variant="ghost"
@@ -469,8 +442,49 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 																)}
 															</div>
 														</SidebarMenuSubItem>
-													))
-												)}
+													))}
+
+												{newDocument.document.title &&
+													newDocument.document.project_id === project.id &&
+													!newDocument.document.id && (
+														<SidebarMenuSubItem>
+															<div className="flex items-center w-full group/document">
+																<SidebarMenuButton
+																	className="flex-1 bg-accent text-accent-foreground"
+																	onClick={() => {
+																		if (isMobile) {
+																			toggleSidebar();
+																		}
+																	}}
+																>
+																	<div className="flex items-center gap-2 cursor-pointer w-full">
+																		<FileText className="h-4 w-4 flex-shrink-0" />
+																		{open && (
+																			<span className="truncate italic">
+																				{newDocument.document.title} (unsaved)
+																			</span>
+																		)}
+																	</div>
+																</SidebarMenuButton>
+																{open && (
+																	<Button
+																		variant="ghost"
+																		size="sm"
+																		className="h-6 w-6 p-0 opacity-0 group-hover/document:opacity-100 transition-opacity flex-shrink-0"
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			updateNewDocument({
+																				snippet: { language: "", code: "" },
+																				document: { title: "", project_id: 0 },
+																			});
+																		}}
+																	>
+																		<Trash2 className="h-3 w-3 text-destructive" />
+																	</Button>
+																)}
+															</div>
+														</SidebarMenuSubItem>
+													)}
 											</SidebarMenuSub>
 										</CollapsibleContent>
 									</SidebarMenuItem>
@@ -567,14 +581,13 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 				</SidebarFooter>
 			)}
 
-			{/* Alert Dialog para eliminar proyecto */}
 			<AlertDialog open={deleteProjectId !== null} onOpenChange={() => setDeleteProjectId(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete Project</AlertDialogTitle>
 						<AlertDialogDescription>
-							Are you sure you want to delete this project? This will permanently delete the
-							project and all of its documents. This action cannot be undone.
+							Are you sure you want to delete this project? This will permanently delete the project
+							and all of its documents. This action cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
