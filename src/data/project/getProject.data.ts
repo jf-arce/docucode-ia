@@ -5,7 +5,7 @@ export async function getProjectsData(userId: string): Promise<GetProjectDto[]> 
 	const supabase = await createClient();
 	const { data, error } = await supabase
 		.from("projects")
-		.select("*, documents:documents_project_id_fkey(*)")
+		.select("*, documents:documents_project_id_fkey(*, snippet:snippets(*))")
 		.eq("user_id", userId)
 		.order("created_at", { ascending: false });
 

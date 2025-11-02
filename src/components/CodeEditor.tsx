@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AceEditor from "react-ace";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Loader } from "./Loader";
+import { toast } from "sonner";
 
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/mode-css";
@@ -58,6 +59,7 @@ const DEFAULT_LANGUAGE = "typescript";
 export function CodeEditor({ code, setCode, onGenerate, isGenerating }: CodeEditorProps) {
 	const [height] = useState("100%");
 	const currentTheme = useTheme();
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const [codeEditorTheme, setCodeEditorTheme] = useState(() => {
 		return localStorage.getItem("editor-theme") || DEFAULT_THEME;
@@ -78,11 +80,103 @@ export function CodeEditor({ code, setCode, onGenerate, isGenerating }: CodeEdit
 		setCode(value);
 	};
 
+	const handleUploadClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	const detectLanguageFromExtension = (filename: string): string => {
+		const extension = filename.split(".").pop()?.toLowerCase();
+		const languageMap: { [key: string]: string } = {
+			ts: "typescript",
+			tsx: "tsx",
+			js: "javascript",
+			jsx: "jsx",
+			py: "python",
+			java: "java",
+			cpp: "c_cpp",
+			c: "c_cpp",
+			cs: "csharp",
+			go: "golang",
+			rs: "rust",
+			php: "php",
+			rb: "ruby",
+			swift: "swift",
+			kt: "kotlin",
+			lua: "lua",
+			sql: "sql",
+			sh: "sh",
+			bash: "sh",
+			yml: "yaml",
+			yaml: "yaml",
+			json: "json",
+			xml: "xml",
+			toml: "toml",
+			md: "markdown",
+			html: "html",
+			css: "css",
+		};
+		return languageMap[extension || ""] || DEFAULT_LANGUAGE;
+	};
+
+	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		// Verificar tamaño del archivo (máximo 1MB)
+		if (file.size > 1024 * 1024) {
+			toast.error("File too large", {
+				description: "Please upload a file smaller than 1MB.",
+				duration: 3000,
+			});
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const content = e.target?.result as string;
+			setCode(content);
+
+			// Detectar y establecer el lenguaje automáticamente
+			const detectedLanguage = detectLanguageFromExtension(file.name);
+			setLanguage(detectedLanguage);
+
+			toast.success("File uploaded successfully", {
+				description: `${file.name} loaded into editor.`,
+				duration: 3000,
+			});
+		};
+
+		reader.onerror = () => {
+			toast.error("Upload failed", {
+				description: "There was an error reading the file.",
+				duration: 3000,
+			});
+		};
+
+		reader.readAsText(file);
+
+		// Limpiar el input para permitir subir el mismo archivo nuevamente
+		event.target.value = "";
+	};
+
 	return (
 		<div className="flex flex-col border-r border-border h-full">
+			<input
+				ref={fileInputRef}
+				type="file"
+				accept=".ts,.tsx,.js,.jsx,.py,.java,.cpp,.c,.cs,.go,.rs,.php,.rb,.swift,.kt,.lua,.sql,.sh,.yml,.yaml,.json,.xml,.toml,.md,.html,.css"
+				onChange={handleFileUpload}
+				style={{ display: "none" }}
+			/>
 			<div className="min-h-[65px] flex flex-wrap gap-4 justify-between border-b border-border bg-card px-4 py-3">
 				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" className="gap-2 bg-transparent">
+					<Button
+						variant="outline"
+						size="sm"
+						className="gap-2 bg-transparent"
+						onClick={handleUploadClick}
+						disabled={isGenerating}
+					>
 						<Upload className="h-3.5 w-3.5" />
 						Upload
 					</Button>
