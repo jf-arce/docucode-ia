@@ -17,10 +17,10 @@ const baseContext =
 export async function POST(req: NextRequest) {
 	const { snippet, document } = await req.json();
 
-	const { language, code } = snippet;
-	const { title, project_id, language: docLanguage } = document;
+	const { language: snippetLanguage, code } = snippet;
+	const { title, language: docLanguage } = document;
 
-	if (language || !code || !title || !project_id) {
+	if (!snippetLanguage || !code || !title) {
 		return Response.json(
 			{
 				message: "Missing required fields",
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 								"\n\n" +
 								"Generate a detailed documentation for the following " +
 								"code snippet written in " +
-								language +
+								snippetLanguage +
 								" code snippet:\n\n" +
 								code +
 								"\n\nDocumentation title: " +
@@ -71,38 +71,9 @@ export async function POST(req: NextRequest) {
 			],
 		});
 
-		const { data: snippetData, error: snippetError } = await supabase
-			.from("snippets")
-			.insert({
-				code: code,
-				lenguage: language,
-			})
-			.select()
-			.single();
-
-		if (snippetError) {
-			throw new Error(`Snippet error: ${snippetError.message}`);
-		}
-
-		const { data: documentData, error: documentError } = await supabase
-			.from("documents")
-			.insert({
-				title: title,
-				content: documentation,
-				project_id: project_id,
-				snippet_id: snippetData.id,
-			})
-			.select()
-			.single();
-
-		if (documentError) {
-			throw new Error(`Document error: ${documentError.message}`);
-		}
-
 		return Response.json({
-			message: "Document generated and saved successfully",
-			document: documentation,
-			documentId: documentData.id,
+			message: "Document generated successfully",
+			documentation: documentation,
 		});
 	} catch (error) {
 		return Response.json(

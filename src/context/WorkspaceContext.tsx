@@ -1,9 +1,12 @@
 "use client";
 
-import { GenerateDocumentationDto } from "@/types/document.types";
 import { createContext, useContext, useState, ReactNode } from "react";
 
-interface DocumentState extends GenerateDocumentationDto {
+interface DocumentState {
+	snippet: {
+		language: string;
+		code: string;
+	};
 	document: {
 		id?: number;
 		title: string;
@@ -22,7 +25,7 @@ const WorkspaceContext = createContext<WorkspaceState | undefined>(undefined);
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
 	const [newDocument, setNewDocument] = useState<DocumentState>({
 		snippet: {
-			lenguage: "",
+			language: "",
 			code: "",
 		},
 		document: {

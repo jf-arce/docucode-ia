@@ -16,13 +16,25 @@ export interface Document {
 
 export type GetDocumentDto = Omit<Document, "created_at" | "snippet_id">;
 
-export type GenerateDocumentationDto = {
+export type GenerateDocumentation = {
 	snippet: {
-		lenguage: string;
+		language: string;
+		code: string;
+	};
+	document: {
+		title: string;
+		language: string;
+	};
+};
+
+export type CreateDocument = {
+	snippet: {
+		language: string;
 		code: string;
 	};
 	document: {
 		title: string;
 		project_id: number;
+		content: string;
 	};
 };

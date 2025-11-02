@@ -1,62 +1,65 @@
 "use server";
 
+import { CreateDocument, Document } from "@/types/document.types";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function createDocumentAction(title: string, projectId: number) {
-    const supabase = await createClient();
+export type CreateDocumentResponse = {
+	success: boolean;
+	document?: Document;
+	error?: string;
+};
 
-    // Verificar autenticación
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+export async function createDocumentAction(
+	newDocument: CreateDocument,
+): Promise<CreateDocumentResponse> {
+	const supabase = await createClient();
 
-    if (!user) {
-        return { success: false, error: "Unauthorized" };
-    }
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 
-    try {
-        // Crear un snippet vacío primero
-        const { data: snippetData, error: snippetError } = await supabase
-            .from("snippets")
-            .insert({
-                code: "",
-                lenguage: "typescript",
-            })
-            .select()
-            .single();
+	if (!user) {
+		return { success: false, error: "Unauthorized" };
+	}
 
-        if (snippetError) {
-            console.error("Error creating snippet:", snippetError);
-            return { success: false, error: snippetError.message };
-        }
+	try {
+		const { data: snippetData, error: snippetError } = await supabase
+			.from("snippets")
+			.insert({
+				code: newDocument.snippet.code,
+				lenguage: newDocument.snippet.language,
+			})
+			.select()
+			.single();
 
-        // Crear el documento
-        const { data: documentData, error: documentError } = await supabase
-            .from("documents")
-            .insert({
-                title: title,
-                content: "",
-                project_id: projectId,
-                snippet_id: snippetData.id,
-            })
-            .select()
-            .single();
+		if (snippetError) {
+			throw new Error(`Snippet error: ${snippetError.message}`);
+		}
 
-        if (documentError) {
-            console.error("Error creating document:", documentError);
-            return { success: false, error: documentError.message };
-        }
+		const { data: documentData, error: documentError } = await supabase
+			.from("documents")
+			.insert({
+				title: newDocument.document.title,
+				content: newDocument.document.content,
+				project_id: newDocument.document.project_id,
+				snippet_id: snippetData.id,
+			})
+			.select()
+			.single();
 
-        // Revalidar la página del workspace para actualizar los datos
-        revalidatePath("/workspace");
+		if (documentError) {
+			throw new Error(`Document error: ${documentError.message}`);
+		}
 
-        return { success: true, document: documentData };
-    } catch (error) {
-        console.error("Error in createDocumentAction:", error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : "Unknown error",
-        };
-    }
+		revalidatePath("/workspace");
+
+		return { success: true, document: documentData };
+	} catch (error) {
+		console.error("Error in createDocumentAction:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : "Unknown error",
+		};
+	}
 }
