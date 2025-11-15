@@ -34,7 +34,7 @@ export async function deleteProjectAction(projectId: number) {
 		// Eliminar todos los snippets asociados a los documentos
 		if (documents && documents.length > 0) {
 			const snippetIds = documents.map((doc) => doc.snippet_id).filter(Boolean);
-			
+
 			if (snippetIds.length > 0) {
 				console.log("Deleting snippets:", snippetIds);
 				const { error: snippetError } = await supabase
@@ -78,9 +78,10 @@ export async function deleteProjectAction(projectId: number) {
 
 		if (!deletedProject || deletedProject.length === 0) {
 			console.error("Project not deleted - possible RLS issue");
-			return { 
-				success: false, 
-				error: "Unable to delete project. Please check your permissions or try refreshing the page." 
+			return {
+				success: false,
+				error:
+					"Unable to delete project. Please check your permissions or try refreshing the page.",
 			};
 		}
 
