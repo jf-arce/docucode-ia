@@ -224,7 +224,9 @@ export function DocumentationPanel({
 	return (
 		<div className="flex flex-col h-full">
 			<div className="min-h-[65px] flex items-center justify-between border-b border-border bg-card px-4 py-3">
-				<h2 className="font-mono text-sm font-medium text-foreground">Generated Documentation</h2>
+				<h2 className="font-mono text-sm font-medium text-foreground">
+					Generated Documentation: {document.title}
+				</h2>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button
@@ -263,13 +265,6 @@ export function DocumentationPanel({
 						</div>
 					</div>
 				) : documentation ? (
-					// <textarea
-					// 	value={documentation}
-					// 	onChange={(e) => setDocumentation(e.target.value)}
-					// 	className="p-4 h-full w-full resize-none bg-transparent font-mono text-sm leading-relaxed text-foreground outline-none overflow-auto"
-					// 	placeholder="Documentation will appear here..."
-					// 	spellCheck={false}
-					// />
 					<div className="p-4 h-full w-full overflow-auto text-sm leading-relaxed font-mono text-foreground">
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}
