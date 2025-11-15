@@ -26,6 +26,7 @@
 		"ai": "^5.0.81",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"html2pdf.js": "^0.12.1",
 		"jspdf": "^3.0.3",
 		"ldrs": "^1.1.7",
 		"lucide-react": "^0.545.0",
@@ -34,6 +35,9 @@
 		"react": "19.1.0",
 		"react-ace": "^14.0.1",
 		"react-dom": "19.1.0",
+		"react-markdown": "^10.1.0",
+		"react-syntax-highlighter": "^16.1.0",
+		"remark-gfm": "^4.0.1",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.3.1"
 	},

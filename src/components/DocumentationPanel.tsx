@@ -10,7 +10,14 @@ import {
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { Loader2 } from "./Loader";
-import { jsPDF } from "jspdf";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+import html2pdf from "html2pdf.js";
 
 interface DocumentationPanelProps {
 	documentation: string;
@@ -20,7 +27,7 @@ interface DocumentationPanelProps {
 
 export function DocumentationPanel({
 	documentation,
-	setDocumentation,
+	// setDocumentation,
 	isGenerating,
 }: DocumentationPanelProps) {
 	const handleExport = (format: string) => {
@@ -76,43 +83,85 @@ export function DocumentationPanel({
 	};
 
 	const downloadAsPDF = (content: string, filename: string) => {
-		const doc = new jsPDF();
-		const pageWidth = doc.internal.pageSize.getWidth();
-		const pageHeight = doc.internal.pageSize.getHeight();
-		const margin = 20;
-		const maxWidth = pageWidth - 2 * margin;
-		const lineHeight = 7;
-		let yPosition = margin;
+		// Convertir Markdown a HTML usando ReactMarkdown de manera temporal
+		const tempContainer = document.createElement("div");
+		tempContainer.style.padding = "30px";
+		tempContainer.style.maxWidth = "800px";
+		tempContainer.style.fontFamily = "'Inter', 'Segoe UI', sans-serif";
+		tempContainer.style.lineHeight = "1.6";
+		tempContainer.style.backgroundColor = "#ffffff";
+		tempContainer.style.color = "#111827";
+		tempContainer.innerHTML = `
+		<h1 style="text-align:center; font-size: 22px; border-bottom: 2px solid #007acc; padding-bottom: 10px;">Code Documentation</h1>
+		<div id="markdown-content"></div>
+	`;
 
-		// Título
-		doc.setFontSize(16);
-		doc.setFont("helvetica", "bold");
-		doc.text("Code Documentation", margin, yPosition);
-		yPosition += lineHeight * 2;
+		document.body.appendChild(tempContainer);
 
-		// Contenido
-		doc.setFontSize(10);
-		doc.setFont("helvetica", "normal");
+		// Renderizamos el markdown dentro del div temporal
+		import("react-dom/server").then(({ renderToString }) => {
+			const html = renderToString(
+				<ReactMarkdown
+					remarkPlugins={[remarkGfm]}
+					components={{
+						code({
+							className,
+							children,
+							...props
+						}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+							const match = /language-(\w+)/.exec(className || "");
+							const isInline = !(className && className.includes("language-"));
+							return !isInline && match ? (
+								<pre
+									style={{
+										background: "#1e1e1e",
+										color: "#dcdcdc",
+										padding: "10px",
+										borderRadius: "6px",
+										overflowX: "auto",
+										fontFamily: "'Fira Code', monospace",
+									}}
+								>
+									<code {...props}>{String(children).replace(/\n$/, "")}</code>
+								</pre>
+							) : (
+								<code
+									style={{
+										background: "#f4f4f4",
+										padding: "2px 4px",
+										borderRadius: "4px",
+										fontFamily: "'Fira Code', monospace",
+									}}
+									{...props}
+								>
+									{children}
+								</code>
+							);
+						},
+					}}
+				>
+					{content}
+				</ReactMarkdown>,
+			);
 
-		const lines = content.split("\n");
+			// Insertamos el HTML generado en el contenedor
+			const markdownContainer = tempContainer.querySelector("#markdown-content");
+			if (markdownContainer) markdownContainer.innerHTML = html;
 
-		for (const line of lines) {
-			// Dividir líneas largas
-			const wrappedLines = doc.splitTextToSize(line || " ", maxWidth);
-
-			for (const wrappedLine of wrappedLines) {
-				// Verificar si necesitamos una nueva página
-				if (yPosition > pageHeight - margin) {
-					doc.addPage();
-					yPosition = margin;
-				}
-
-				doc.text(wrappedLine, margin, yPosition);
-				yPosition += lineHeight;
-			}
-		}
-
-		doc.save(`${filename}.pdf`);
+			html2pdf()
+				.set({
+					margin: 0.5,
+					filename: `${filename}.pdf`,
+					image: { type: "jpeg" as const, quality: 0.98 },
+					html2canvas: { scale: 2 },
+					jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+				})
+				.from(tempContainer)
+				.save()
+				.then(() => {
+					document.body.removeChild(tempContainer);
+				});
+		});
 	};
 
 	const downloadAsHTML = (content: string, filename: string) => {
@@ -214,13 +263,44 @@ export function DocumentationPanel({
 						</div>
 					</div>
 				) : documentation ? (
-					<textarea
-						value={documentation}
-						onChange={(e) => setDocumentation(e.target.value)}
-						className="p-4 h-full w-full resize-none bg-transparent font-mono text-sm leading-relaxed text-foreground outline-none overflow-auto"
-						placeholder="Documentation will appear here..."
-						spellCheck={false}
-					/>
+					// <textarea
+					// 	value={documentation}
+					// 	onChange={(e) => setDocumentation(e.target.value)}
+					// 	className="p-4 h-full w-full resize-none bg-transparent font-mono text-sm leading-relaxed text-foreground outline-none overflow-auto"
+					// 	placeholder="Documentation will appear here..."
+					// 	spellCheck={false}
+					// />
+					<div className="p-4 h-full w-full overflow-auto text-sm leading-relaxed font-mono text-foreground">
+						<ReactMarkdown
+							remarkPlugins={[remarkGfm]}
+							components={{
+								code({
+									className,
+									children,
+									...props
+								}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+									const match = /language-(\w+)/.exec(className || "");
+									const isInline = !(className && className.includes("language-"));
+									return !isInline && match ? (
+										<SyntaxHighlighter
+											style={vscDarkPlus}
+											language={match[1]}
+											PreTag="div"
+											{...props}
+										>
+											{String(children).replace(/\n$/, "")}
+										</SyntaxHighlighter>
+									) : (
+										<code className="bg-muted text-foreground rounded px-1 py-0.5" {...props}>
+											{children}
+										</code>
+									);
+								},
+							}}
+						>
+							{documentation}
+						</ReactMarkdown>
+					</div>
 				) : (
 					<div className="flex h-full items-center justify-center">
 						<div className="text-center">
