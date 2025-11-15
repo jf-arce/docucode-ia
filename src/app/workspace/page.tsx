@@ -9,6 +9,7 @@ import { FileText } from "lucide-react";
 import { updateDocumentAction } from "@/actions/updateDocument.action";
 import { createDocumentAction } from "@/actions/createDocument.action";
 import { generateDocumentation } from "@/services/generate-documentation";
+import { NewProjectButton } from "@/components/NewProjectButton";
 
 export default function WorkspacePage() {
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -112,13 +113,19 @@ export default function WorkspacePage() {
 					</div>
 				</>
 			) : (
-				<div className="flex flex-1 items-center justify-center">
-					<div className="text-center">
-						<FileText className="mx-auto h-16 w-16 text-muted-foreground/50" />
-						<p className="mt-4 text-lg font-medium text-foreground">No document selected</p>
-						<p className="mt-2 text-sm text-muted-foreground">
-							Select or create a document from the sidebar to start coding.
+				<div className="flex flex-col flex-1 items-center justify-center gap-6">
+					<div className="text-center flex flex-col gap-5">
+						<div>
+							<FileText className="mx-auto h-16 w-16 text-muted-foreground/50" />
+							<p className="mt-3 text-2xl font-medium text-foreground">No document selected</p>
+						</div>
+						<p className="text-md text-muted-foreground">
+							Select an existing document or Create a new project to get started documenting your
+							code.
 						</p>
+					</div>
+					<div>
+						<NewProjectButton />
 					</div>
 				</div>
 			)}
