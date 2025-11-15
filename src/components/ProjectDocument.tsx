@@ -29,7 +29,7 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 	const router = useRouter();
 	const isMobile = useIsMobile();
 	const { open, toggleSidebar } = useSidebar();
-	const { newDocument, updateNewDocument } = useWorkspace();
+	const { newDocument, updateNewDocument, updateDocumentation, updateCode } = useWorkspace();
 	const [deleteDocumentId, setDeleteDocumentId] = useState<number | null>(null);
 
 	const handleDeleteDocument = async () => {
@@ -71,9 +71,14 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 		}
 	};
 
+	const handleDocumentClick = () => {
+		updateDocumentation(document.content || "");
+		updateCode(document.snippet?.code || "");
+	};
+
 	return (
 		<>
-			<div className="flex items-center w-full group/document gap-3">
+			<div className="flex items-center w-full group/document gap-3" onClick={handleDocumentClick}>
 				<SidebarMenuButton
 					asChild
 					className={`flex-1 ${

@@ -17,7 +17,11 @@ interface DocumentState {
 
 interface WorkspaceState {
 	newDocument: DocumentState;
+	code: string;
+	documentation: string;
 	updateNewDocument: (doc: DocumentState) => void;
+	updateCode: (code: string) => void;
+	updateDocumentation: (doc: string) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceState | undefined>(undefined);
@@ -33,12 +37,33 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 			project_id: 0,
 		},
 	});
+
+	const [code, setCode] = useState<string>("");
+	const [documentation, setDocumentation] = useState("");
+
 	const updateNewDocument = (doc: DocumentState) => {
 		setNewDocument(doc);
 	};
 
+	const updateCode = (code: string) => {
+		setCode(code);
+	};
+
+	const updateDocumentation = (doc: string) => {
+		setDocumentation(doc);
+	};
+
 	return (
-		<WorkspaceContext.Provider value={{ newDocument, updateNewDocument }}>
+		<WorkspaceContext.Provider
+			value={{
+				newDocument,
+				updateNewDocument,
+				code,
+				documentation,
+				updateCode,
+				updateDocumentation,
+			}}
+		>
 			{children}
 		</WorkspaceContext.Provider>
 	);

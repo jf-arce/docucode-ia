@@ -21,15 +21,10 @@ import html2pdf from "html2pdf.js";
 
 interface DocumentationPanelProps {
 	documentation: string;
-	setDocumentation: (doc: string) => void;
 	isGenerating: boolean;
 }
 
-export function DocumentationPanel({
-	documentation,
-	// setDocumentation,
-	isGenerating,
-}: DocumentationPanelProps) {
+export function DocumentationPanel({ documentation, isGenerating }: DocumentationPanelProps) {
 	const handleExport = (format: string) => {
 		if (!documentation) {
 			toast.error("No documentation to export", {

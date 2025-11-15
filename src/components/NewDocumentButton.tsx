@@ -25,7 +25,7 @@ interface NewDocumentButtonProps {
 export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 	const [isDialogOpen, setIsDialogOpen] = useState<{ [key: number]: boolean }>({});
 	const { toggleSidebar } = useSidebar();
-	const { updateNewDocument } = useWorkspace();
+	const { updateNewDocument, updateCode, updateDocumentation } = useWorkspace();
 	const isMobile = useIsMobile();
 
 	const handleSubmit = async (e: React.FormEvent, projectId: number) => {
@@ -53,6 +53,9 @@ export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 				content: "",
 			},
 		});
+
+		updateCode("");
+		updateDocumentation("");
 
 		setIsDialogOpen({ ...isDialogOpen, [projectId]: false });
 

@@ -11,10 +11,9 @@ import { createDocumentAction } from "@/actions/createDocument.action";
 import { generateDocumentation } from "@/services/generate-documentation";
 
 export default function WorkspacePage() {
-	const [code, setCode] = useState<string>("");
-	const [documentation, setDocumentation] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
-	const { newDocument, updateNewDocument } = useWorkspace();
+	const { newDocument, updateNewDocument, code, documentation, updateDocumentation } =
+		useWorkspace();
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -36,7 +35,7 @@ export default function WorkspacePage() {
 					document: { title: newDocument.document.title, language: "en" },
 				});
 
-				setDocumentation(documentation);
+				updateDocumentation(documentation);
 
 				const updateResult = await updateDocumentAction(
 					newDocument.document.id,
@@ -69,7 +68,7 @@ export default function WorkspacePage() {
 				});
 
 				if (success && document) {
-					setDocumentation(document.content);
+					updateDocumentation(document.content);
 					updateNewDocument({
 						snippet: {
 							language: editorLanguage,
@@ -105,19 +104,10 @@ export default function WorkspacePage() {
 				<>
 					<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
 						<div className="sm:w-1/2 h-full">
-							<CodeEditor
-								code={code}
-								setCode={setCode}
-								onGenerate={handleGenerate}
-								isGenerating={isGenerating}
-							/>
+							<CodeEditor code={code} onGenerate={handleGenerate} isGenerating={isGenerating} />
 						</div>
 						<div className="sm:w-1/2 h-full">
-							<DocumentationPanel
-								documentation={documentation}
-								setDocumentation={setDocumentation}
-								isGenerating={isGenerating}
-							/>
+							<DocumentationPanel documentation={documentation} isGenerating={isGenerating} />
 						</div>
 					</div>
 				</>
