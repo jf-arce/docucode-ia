@@ -103,12 +103,6 @@ export default function WorkspacePage() {
 		<div className="flex h-full flex-col">
 			{newDocument.document.title && newDocument.document.project_id > 0 ? (
 				<>
-					<div className="border-b border-border bg-card px-6 py-3">
-						<h1 className="text-lg font-semibold text-foreground">{newDocument.document.title}</h1>
-						<p className="text-xs text-muted-foreground">
-							Project ID: {newDocument.document.project_id}
-						</p>
-					</div>
 					<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
 						<div className="sm:w-1/2 h-full">
 							<CodeEditor
