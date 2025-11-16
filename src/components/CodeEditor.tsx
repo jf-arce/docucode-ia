@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
 import AceEditor from "react-ace";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -57,7 +57,6 @@ const DEFAULT_THEME = "one_dark";
 const DEFAULT_LANGUAGE = "typescript";
 
 export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) {
-	const [height] = useState("100%");
 	const currentTheme = useTheme();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { updateCode } = useWorkspace();
@@ -258,8 +257,8 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 					value={code}
 					onChange={handleChange}
 					width="100%"
+					height={"100vh"}
 					enableMobileMenu
-					height={height}
 					fontSize={14}
 					showPrintMargin={false}
 					showGutter={true}

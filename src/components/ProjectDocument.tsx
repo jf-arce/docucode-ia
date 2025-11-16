@@ -30,7 +30,7 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 	const router = useRouter();
 	const isMobile = useIsMobile();
 	const { open, toggleSidebar } = useSidebar();
-	const { newDocument, updateNewDocument, updateDocumentation, updateCode } = useWorkspace();
+	const { newDocument, updateNewDocument } = useWorkspace();
 	const [deleteDocumentId, setDeleteDocumentId] = useState<number | null>(null);
 
 	const handleDeleteDocument = async () => {
@@ -59,7 +59,7 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 				});
 			}
 
-			router.refresh();
+			router.push(`/workspace`);
 		} catch (error) {
 			console.error("Error deleting document:", error);
 			toast.error("Failed to delete document", {
@@ -72,12 +72,6 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 		}
 	};
 
-	// const handleDocumentClick = () => {
-	// 	// updateDocumentation(document.content || "");
-	// 	// updateCode(document.snippet?.code || "");
-	// 	router.push(`/workspace/p-${project.id}/d/${document.id}`);
-	// };
-
 	return (
 		<>
 			<div className="flex items-center w-full group/document gap-3">
@@ -87,18 +81,6 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 						newDocument.document.id === document.id ? "bg-accent text-accent-foreground" : ""
 					}`}
 					onClick={() => {
-						// updateNewDocument({
-						// 	snippet: {
-						// 		language: document.snippet?.language || "typescript",
-						// 		code: document.snippet?.code || "",
-						// 	},
-						// 	document: {
-						// 		id: document.id,
-						// 		title: document.title,
-						// 		project_id: project.id,
-						// 		content: document.content || "",
-						// 	},
-						// });
 						if (isMobile) {
 							toggleSidebar();
 						}

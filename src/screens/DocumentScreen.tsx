@@ -9,21 +9,19 @@ import { updateDocumentAction } from "@/actions/updateDocument.action";
 import { createDocumentAction } from "@/actions/createDocument.action";
 import { generateDocumentation } from "@/services/generate-documentation";
 import { Document } from "@/types/document.types";
+import { useRouter } from "next/navigation";
 
 interface DocumentScreenProps {
 	document: Document;
 }
 
 export const DocumentScreen = ({ document }: DocumentScreenProps) => {
+	const router = useRouter();
 	const [isGenerating, setIsGenerating] = useState(false);
 	const { newDocument, updateNewDocument, code, updateCode, documentation, updateDocumentation } =
 		useWorkspace();
 
 	useEffect(() => {
-		if (document.snippet) {
-			updateCode(document.snippet.code);
-		}
-		updateDocumentation(document.content);
 		updateNewDocument({
 			snippet: {
 				language: document.snippet?.language || "typescript",
@@ -36,6 +34,9 @@ export const DocumentScreen = ({ document }: DocumentScreenProps) => {
 				content: document.content || "",
 			},
 		});
+
+		updateCode(document.snippet?.code || "");
+		updateDocumentation(document.content || "");
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [document.id]);
@@ -112,6 +113,8 @@ export const DocumentScreen = ({ document }: DocumentScreenProps) => {
 					description: `Document created.`,
 					duration: 4000,
 				});
+
+				router.push(`/workspace/p-${newDocument.document.project_id}/d/${document?.id}`);
 			}
 		} catch (error) {
 			console.error("Error generating documentation:", error);
@@ -128,6 +131,7 @@ export const DocumentScreen = ({ document }: DocumentScreenProps) => {
 			<div className="sm:w-1/2 h-full">
 				<CodeEditor code={code} onGenerate={handleGenerate} isGenerating={isGenerating} />
 			</div>
+
 			<div className="sm:w-1/2 h-full">
 				<DocumentationPanel documentation={documentation} isGenerating={isGenerating} />
 			</div>

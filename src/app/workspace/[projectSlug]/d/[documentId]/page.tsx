@@ -28,7 +28,5 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 		return notFound();
 	}
 
-	console.log("Fetched document:", document);
-
 	return <DocumentScreen document={document} />;
 }
