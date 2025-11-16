@@ -19,6 +19,7 @@ import {
 	AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { useState } from "react";
+import Link from "next/link";
 
 interface ProjectDocumentProps {
 	document: Document;
@@ -71,41 +72,44 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 		}
 	};
 
-	const handleDocumentClick = () => {
-		updateDocumentation(document.content || "");
-		updateCode(document.snippet?.code || "");
-	};
+	// const handleDocumentClick = () => {
+	// 	// updateDocumentation(document.content || "");
+	// 	// updateCode(document.snippet?.code || "");
+	// 	router.push(`/workspace/p-${project.id}/d/${document.id}`);
+	// };
 
 	return (
 		<>
-			<div className="flex items-center w-full group/document gap-3" onClick={handleDocumentClick}>
+			<div className="flex items-center w-full group/document gap-3">
 				<SidebarMenuButton
 					asChild
 					className={`flex-1 ${
 						newDocument.document.id === document.id ? "bg-accent text-accent-foreground" : ""
 					}`}
 					onClick={() => {
-						updateNewDocument({
-							snippet: {
-								language: document.snippet?.lenguage || "typescript",
-								code: document.snippet?.code || "",
-							},
-							document: {
-								id: document.id,
-								title: document.title,
-								project_id: project.id,
-								content: document.content || "",
-							},
-						});
+						// updateNewDocument({
+						// 	snippet: {
+						// 		language: document.snippet?.language || "typescript",
+						// 		code: document.snippet?.code || "",
+						// 	},
+						// 	document: {
+						// 		id: document.id,
+						// 		title: document.title,
+						// 		project_id: project.id,
+						// 		content: document.content || "",
+						// 	},
+						// });
 						if (isMobile) {
 							toggleSidebar();
 						}
 					}}
 				>
-					<div className="flex items-center gap-2 cursor-pointer w-full">
-						<FileText className="h-4 w-4 shrink-0" />
-						{open && <span className="truncate">{document.title}</span>}
-					</div>
+					<Link href={`/workspace/p-${project.id}/d/${document.id}`}>
+						<div className="flex items-center gap-2 cursor-pointer w-full">
+							<FileText className="h-4 w-4 shrink-0" />
+							{open && <span className="truncate">{document.title}</span>}
+						</div>
+					</Link>
 				</SidebarMenuButton>
 				{open && (
 					<Button
