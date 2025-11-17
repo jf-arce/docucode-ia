@@ -14,8 +14,9 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useRouter } from "next/navigation";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { LogOut, ChevronUp, User2, Sun, Moon, Computer } from "lucide-react";
+import { LogOut, ChevronUp, User2, Sun, Moon, Computer, HomeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface SidebarUserMenuProps {
 	user: User;
@@ -75,8 +76,14 @@ export const SidebarUserMenu = ({ user }: SidebarUserMenuProps) => {
 							<span className="text-xs text-muted-foreground truncate">{user?.email}</span>
 						</div>
 					</DropdownMenuLabel>
-
 					<DropdownMenuSeparator />
+
+					<Link href="/">
+						<DropdownMenuItem className="cursor-pointer">
+							<HomeIcon className="h-4 w-4" />
+							<span>Home</span>
+						</DropdownMenuItem>
+					</Link>
 
 					{mounted && (
 						<DropdownMenuItem asChild className="cursor-pointer">
