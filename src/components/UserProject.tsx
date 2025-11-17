@@ -134,13 +134,28 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 									</SidebarMenuSubItem>
 								))}
 
-							{newDocument.document.title &&
-								newDocument.document.project_id === project.id &&
-								!newDocument.document.id && (
-									<SidebarMenuSubItem>
+							{newDocument.document.title && newDocument.document.project_id === project.id && (
+								<SidebarMenuSubItem>
+									{!newDocument.document.id ? (
 										<UnsavedProjectDocument />
-									</SidebarMenuSubItem>
-								)}
+									) : (
+										// Display the newDocument only if it's not already in the backend project documents
+										!project.documents.some((doc) => doc.id === newDocument.document.id) && (
+											<ProjectDocument
+												document={{
+													id: newDocument.document.id,
+													title: newDocument.document.title,
+													content: newDocument.document.content || "",
+													project_id: newDocument.document.project_id,
+													created_at: new Date().toISOString(),
+													snippet_id: 0,
+												}}
+												project={project}
+											/>
+										)
+									)}
+								</SidebarMenuSubItem>
+							)}
 						</SidebarMenuSub>
 					</CollapsibleContent>
 				</SidebarMenuItem>

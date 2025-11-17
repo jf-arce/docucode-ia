@@ -68,7 +68,6 @@ export const useGenerateDocumentation = () => {
 				});
 
 				if (success && document) {
-					updateDocumentation(document.content);
 					updateNewDocument({
 						snippet: {
 							language: editorLanguage,
@@ -81,14 +80,16 @@ export const useGenerateDocumentation = () => {
 							content: document.content,
 						},
 					});
+
+					updateDocumentation(document.content);
+
+					router.push(`/workspace/p-${newDocument.document.project_id}/d/${document?.id}`);
 				}
 
 				toast.success("Documentation generated successfully", {
 					description: `Document created.`,
 					duration: 4000,
 				});
-
-				router.push(`/workspace/p-${newDocument.document.project_id}/d/${document?.id}`);
 			}
 		} catch (error) {
 			console.error("Error generating documentation:", error);
