@@ -54,7 +54,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 					{open ? (
 						<>
 							<SidebarMenuButton className="cursor-pointer w-fit" asChild>
-								<Link href="/">
+								<Link href="/workspace">
 									<Code2 className="text-primary" />
 								</Link>
 							</SidebarMenuButton>
