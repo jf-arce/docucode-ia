@@ -20,6 +20,7 @@ import {
 } from "./ui/alert-dialog";
 import { useState } from "react";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface ProjectDocumentProps {
 	document: Document;
@@ -74,39 +75,47 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 
 	return (
 		<>
-			<div className="flex items-center w-full group/document gap-3">
-				<SidebarMenuButton
-					asChild
-					className={`flex-1 ${
-						newDocument.document.id === document.id ? "bg-accent text-accent-foreground" : ""
-					}`}
-					onClick={() => {
-						if (isMobile) {
-							toggleSidebar();
-						}
-					}}
-				>
-					<Link href={`/workspace/p-${project.id}/d/${document.id}`}>
-						<div className="flex items-center gap-2 cursor-pointer w-full">
-							<FileText className="h-4 w-4 shrink-0" />
-							{open && <span className="truncate">{document.title}</span>}
-						</div>
-					</Link>
-				</SidebarMenuButton>
-				{open && (
-					<Button
-						variant="ghost"
-						size="sm"
-						className="h-6 w-6 p-0 opacity-0 group-hover/document:opacity-100 transition-opacity shrink-0"
-						onClick={(e) => {
-							e.stopPropagation();
-							setDeleteDocumentId(document.id);
-						}}
-					>
-						<Trash2 className="h-3 w-3 text-destructive" />
-					</Button>
-				)}
-			</div>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<div className="flex items-center w-full group/document gap-3">
+						<SidebarMenuButton
+							asChild
+							className={`flex-1 ${
+								newDocument.document.id === document.id ? "bg-accent text-accent-foreground" : ""
+							}`}
+							onClick={() => {
+								if (isMobile) {
+									toggleSidebar();
+								}
+							}}
+						>
+							<Link href={`/workspace/p-${project.id}/d/${document.id}`}>
+								<div className="flex items-center gap-2 cursor-pointer w-full">
+									<FileText className="h-4 w-4 shrink-0" />
+									{open && <span className="truncate">{document.title}</span>}
+								</div>
+							</Link>
+						</SidebarMenuButton>
+
+						{open && (
+							<Button
+								variant="ghost"
+								size="sm"
+								className="h-6 w-6 p-0 opacity-0 group-hover/document:opacity-100 transition-opacity shrink-0"
+								onClick={(e) => {
+									e.stopPropagation();
+									setDeleteDocumentId(document.id);
+								}}
+							>
+								<Trash2 className="h-3 w-3 text-destructive" />
+							</Button>
+						)}
+					</div>
+				</TooltipTrigger>
+				<TooltipContent side="left" className="max-w-xs">
+					<p className="truncate">{document.title}</p>
+				</TooltipContent>
+			</Tooltip>
 
 			<AlertDialog open={deleteDocumentId !== null} onOpenChange={() => setDeleteDocumentId(null)}>
 				<AlertDialogContent>
