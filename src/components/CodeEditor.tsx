@@ -257,7 +257,6 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 					value={code}
 					onChange={handleChange}
 					width="100%"
-					height={"100vh"}
 					enableMobileMenu
 					fontSize={14}
 					showPrintMargin={false}
@@ -271,6 +270,7 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 					style={{
 						backgroundColor: "var(--background)",
 						color: "var(--foreground)",
+						height: "calc(100vh - 65px)",
 					}}
 				/>
 			</div>
