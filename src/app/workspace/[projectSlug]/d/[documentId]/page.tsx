@@ -17,15 +17,23 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
 	const supabase = await createClient();
 
-	const { error, data: document } = await supabase
+	const {
+		error,
+		data: document,
+		status,
+	} = await supabase
 		.from("documents")
 		.select("*, snippet:snippets(*)")
 		.eq("id", parseInt(documentId))
 		.eq("project_id", parseInt(projectId))
 		.single();
 
-	if (error || !document) {
+	if (error && status === 406) {
 		return notFound();
+	}
+
+	if (error) {
+		throw new Error(error.message);
 	}
 
 	return <DocumentScreen document={document} />;

@@ -73,7 +73,7 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 
 			<SidebarContent className="overflow-hidden">
 				<SidebarGroup>
-					<SidebarGroupLabel>Proyectos</SidebarGroupLabel>
+					<SidebarGroupLabel className="text-sm font-medium">Projects</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							<SidebarMenuItem>

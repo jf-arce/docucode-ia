@@ -159,10 +159,6 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 		event.target.value = "";
 	};
 
-	useEffect(() => {
-		console.log("CodeEditor recibió:", code);
-	}, [code]);
-
 	return (
 		<div className="flex flex-col border-r border-border h-full">
 			<input

@@ -15,8 +15,6 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 
 	const userProjectsData = await getProjectsData(data.user.id);
 
-	console.log("User Projects Data:", userProjectsData);
-
 	return (
 		<div className="flex">
 			<WorkspaceProvider>
