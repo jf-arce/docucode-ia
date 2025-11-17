@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useWorkspace } from "@/context/WorkspaceContext";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { deleteProjectAction } from "@/actions/deleteProject.action";
 import { NewDocumentButton } from "./NewDocumentButton";
 import { ProjectDocument } from "./ProjectDocument";
@@ -43,6 +43,7 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 	const { open } = useSidebar();
 	const { newDocument, updateNewDocument } = useWorkspace();
 	const [deleteProjectId, setDeleteProjectId] = useState<number | null>(null);
+	const { documentId: currentDocumentId } = useParams();
 
 	const handleDeleteProject = async () => {
 		if (!deleteProjectId) return;
@@ -85,7 +86,11 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 
 	return (
 		<>
-			<Collapsible key={project.id} asChild defaultOpen={false}>
+			<Collapsible
+				key={project.id}
+				asChild
+				defaultOpen={project.documents.some((doc) => doc.id === Number(currentDocumentId))}
+			>
 				<SidebarMenuItem>
 					<div className="flex items-center w-full group/project">
 						<CollapsibleTrigger asChild>
