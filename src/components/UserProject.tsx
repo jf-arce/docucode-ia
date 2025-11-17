@@ -45,6 +45,8 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 	const [deleteProjectId, setDeleteProjectId] = useState<number | null>(null);
 	const { documentId: currentDocumentId } = useParams();
 
+	const isDocumentInProject = project.documents.some((doc) => doc.id === Number(currentDocumentId));
+
 	const handleDeleteProject = async () => {
 		if (!deleteProjectId) return;
 
@@ -86,11 +88,7 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 
 	return (
 		<>
-			<Collapsible
-				key={project.id}
-				asChild
-				defaultOpen={project.documents.some((doc) => doc.id === Number(currentDocumentId))}
-			>
+			<Collapsible key={project.id} asChild defaultOpen={isDocumentInProject}>
 				<SidebarMenuItem>
 					<div className="flex items-center w-full group/project">
 						<CollapsibleTrigger asChild>
