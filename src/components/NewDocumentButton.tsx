@@ -85,7 +85,7 @@ export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 							<DialogTitle>Create new document</DialogTitle>
 							<DialogDescription>Create a new document in {project.name}</DialogDescription>
 						</DialogHeader>
-						<div className="grid gap-4">
+						<div className="grid gap-4 mb-3">
 							<div className="grid gap-3">
 								<Label htmlFor="title">Title</Label>
 								<Input id="title" name="title" placeholder="Document name" autoFocus />

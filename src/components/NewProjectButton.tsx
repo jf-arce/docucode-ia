@@ -33,7 +33,7 @@ export const NewProjectButton = () => {
 						<DialogTitle>Create new project</DialogTitle>
 						<DialogDescription>Create your documentation project.</DialogDescription>
 					</DialogHeader>
-					<div className="grid gap-4">
+					<div className="grid gap-4 mb-3">
 						<div className="grid gap-3">
 							<Label htmlFor="name">Name</Label>
 							<Input id="name" name="name" defaultValue="Project 1" />
