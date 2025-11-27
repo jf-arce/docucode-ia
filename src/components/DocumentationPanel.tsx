@@ -19,6 +19,8 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import html2pdf from "html2pdf.js";
 
+import "github-markdown-css/github-markdown.css";
+
 interface DocumentationPanelProps {
 	documentation: string;
 	isGenerating: boolean;
@@ -260,7 +262,10 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 						</div>
 					</div>
 				) : documentation ? (
-					<div className="max-h-[calc(100vh-65px)] p-4 w-full overflow-auto text-sm leading-relaxed font-mono text-foreground">
+					<div
+						className="markdown-body max-w-none max-h-[calc(100vh-65px)] p-4 w-full overflow-auto text-sm leading-relaxed"
+						style={{ backgroundColor: "transparent" }}
+					>
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}
 							components={{
@@ -276,16 +281,22 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 											style={vscDarkPlus}
 											language={match[1]}
 											PreTag="div"
+											className="rounded-md my-2"
+											customStyle={{
+												backgroundColor: "transparent",
+												margin: 0,
+											}}
 											{...props}
 										>
 											{String(children).replace(/\n$/, "")}
 										</SyntaxHighlighter>
 									) : (
-										<code className="bg-muted text-foreground rounded px-1 py-0.5" {...props}>
+										<code className={className} {...props}>
 											{children}
 										</code>
 									);
 								},
+								tr: ({ ...props }) => <tr style={{ backgroundColor: "transparent" }} {...props} />,
 							}}
 						>
 							{documentation}
