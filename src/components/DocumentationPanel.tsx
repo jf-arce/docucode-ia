@@ -263,7 +263,7 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 					</div>
 				) : documentation ? (
 					<div
-						className="markdown-body max-w-none max-h-[calc(100vh-65px)] p-4 w-full overflow-auto text-sm leading-relaxed"
+						className="markdown-body h-full p-4 w-full overflow-auto text-sm leading-relaxed"
 						style={{ backgroundColor: "transparent" }}
 					>
 						<ReactMarkdown

@@ -21,11 +21,11 @@ export default function WorkspacePage() {
 		<div className="flex h-full flex-col relative px-4">
 			{newDocument.document.title && newDocument.document.project_id > 0 ? (
 				<>
-					<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
-						<div className="sm:w-1/2 h-full">
+					<div className="flex flex-col sm:flex-row flex-1 overflow-hidden h-full">
+						<div className="w-full h-1/2 sm:w-1/2 sm:h-full">
 							<CodeEditor code={code} onGenerate={handleGenerate} isGenerating={isGenerating} />
 						</div>
-						<div className="sm:w-1/2 h-full">
+						<div className="w-full h-1/2 sm:w-1/2 sm:h-full">
 							<DocumentationPanel documentation={documentation} isGenerating={isGenerating} />
 						</div>
 					</div>

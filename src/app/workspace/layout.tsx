@@ -16,14 +16,14 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 	const userProjectsData = await getProjectsData(data.user.id);
 
 	return (
-		<div className="flex">
+		<div className="fixed inset-0 flex overflow-hidden bg-background">
 			<WorkspaceProvider>
-				<div className="relative">
+				<div className="relative h-full">
 					<ProjectsSidebar user={data?.user} userProjectsData={userProjectsData} />
 				</div>
-				<div className="flex-1 min-h-screen">
+				<div className="flex-1 flex flex-col h-full overflow-hidden">
 					<NavbarWorkspaceWrapper user={data?.user} />
-					{children}
+					<main className="flex-1 flex flex-col overflow-hidden relative">{children}</main>
 				</div>
 			</WorkspaceProvider>
 		</div>
