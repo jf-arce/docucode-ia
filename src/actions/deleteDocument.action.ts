@@ -44,9 +44,10 @@ export async function deleteDocumentAction(documentId: number) {
 
 		if (!deletedDoc || deletedDoc.length === 0) {
 			console.error("Document not deleted - possible RLS issue");
-			return { 
-				success: false, 
-				error: "Unable to delete document. Please check your permissions or try refreshing the page." 
+			return {
+				success: false,
+				error:
+					"Unable to delete document. Please check your permissions or try refreshing the page.",
 			};
 		}
 

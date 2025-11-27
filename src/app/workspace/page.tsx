@@ -1,106 +1,24 @@
 "use client";
 
 import { CodeEditor } from "@/components/CodeEditor";
-import { useState } from "react";
-import { toast } from "sonner";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
-import { FileText } from "lucide-react";
-import { updateDocumentAction } from "@/actions/updateDocument.action";
-import { createDocumentAction } from "@/actions/createDocument.action";
-import { generateDocumentation } from "@/services/generate-documentation";
-import { NewProjectButton } from "@/components/NewProjectButton";
+import { useGenerateDocumentation } from "@/hooks/use-generate-documentation";
+import { EmptyWorkspace } from "@/components/EmptyWorkspace";
+import { useEffect } from "react";
+import { Code2Icon } from "lucide-react";
 
 export default function WorkspacePage() {
-	const [isGenerating, setIsGenerating] = useState(false);
-	const { newDocument, updateNewDocument, code, documentation, updateDocumentation } =
-		useWorkspace();
+	const { newDocument, code, documentation, resetNewDocument } = useWorkspace();
+	const { isGenerating, handleGenerate } = useGenerateDocumentation();
 
-	const handleGenerate = async () => {
-		if (!code.trim()) {
-			toast.error("Please enter some code to document", {
-				description: "The code editor is empty.",
-				duration: 3000,
-			});
-			return;
-		}
-
-		setIsGenerating(true);
-
-		try {
-			const editorLanguage = localStorage.getItem("editor-language") || "typescript";
-
-			if (newDocument.document.id) {
-				const documentation = await generateDocumentation({
-					snippet: { language: editorLanguage, code: code },
-					document: { title: newDocument.document.title, language: "en" },
-				});
-
-				updateDocumentation(documentation);
-
-				const updateResult = await updateDocumentAction(
-					newDocument.document.id,
-					code,
-					editorLanguage,
-					documentation,
-				);
-
-				if (!updateResult.success) {
-					throw new Error(updateResult.error || "Failed to save documentation");
-				}
-
-				toast.success("Documentation generated successfully", {
-					description: `Document updated.`,
-					duration: 4000,
-				});
-			} else {
-				const documentation = await generateDocumentation({
-					snippet: { language: editorLanguage, code: code },
-					document: { title: newDocument.document.title, language: "en" },
-				});
-
-				const { success, document } = await createDocumentAction({
-					snippet: { language: editorLanguage, code: code },
-					document: {
-						title: newDocument.document.title,
-						project_id: newDocument.document.project_id,
-						content: documentation,
-					},
-				});
-
-				if (success && document) {
-					updateDocumentation(document.content);
-					updateNewDocument({
-						snippet: {
-							language: editorLanguage,
-							code: code,
-						},
-						document: {
-							id: document.id,
-							title: newDocument.document.title,
-							project_id: newDocument.document.project_id,
-							content: document.content,
-						},
-					});
-				}
-
-				toast.success("Documentation generated successfully", {
-					description: `Document created.`,
-					duration: 4000,
-				});
-			}
-		} catch (error) {
-			console.error("Error generating documentation:", error);
-			toast.error("Failed to generate documentation", {
-				description: "Unable to generate the documentation at the moment. Please try again later.",
-			});
-		} finally {
-			setIsGenerating(false);
-		}
-	};
+	useEffect(() => {
+		resetNewDocument();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
-		<div className="flex h-full flex-col">
+		<div className="flex h-full flex-col relative px-4">
 			{newDocument.document.title && newDocument.document.project_id > 0 ? (
 				<>
 					<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
@@ -113,22 +31,27 @@ export default function WorkspacePage() {
 					</div>
 				</>
 			) : (
-				<div className="flex flex-col flex-1 items-center justify-center gap-6">
-					<div className="text-center flex flex-col gap-5">
-						<div>
-							<FileText className="mx-auto h-16 w-16 text-muted-foreground/50" />
-							<p className="mt-3 text-2xl font-medium text-foreground">No document selected</p>
-						</div>
-						<p className="text-md text-muted-foreground">
-							Select an existing document or Create a new project to get started documenting your
-							code.
-						</p>
+				<div className="flex flex-col items-center justify-center flex-1 gap-4">
+					<div className="flex flex-col sm:flex-row items-center gap-2 py-4">
+						<h1 className="text-md font-medium text-center">Welcome to DocuCode AI</h1>
+						<Code2Icon className="mx-auto text-primary/50 size-5" />
 					</div>
-					<div>
-						<NewProjectButton />
-					</div>
+					<EmptyWorkspace />
 				</div>
 			)}
+			<div className="min-h-screen w-full absolute -z-50">
+				<div
+					className="absolute inset-0 z-0"
+					style={{
+						backgroundImage: `
+       radial-gradient(circle at 30% 30%, #222222 0.5px, transparent 1px),
+       radial-gradient(circle at 75% 75%, #111111 0.5px, transparent 1px)
+     `,
+						backgroundSize: "10px 10px",
+						imageRendering: "pixelated",
+					}}
+				/>
+			</div>
 		</div>
 	);
 }

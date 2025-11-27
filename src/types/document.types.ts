@@ -1,7 +1,7 @@
 export interface Snippet {
 	id: number;
 	code: string;
-	lenguage: string;
+	language: string;
 }
 
 export interface Document {
