@@ -251,16 +251,16 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 				</DropdownMenu>
 			</div>
 
-			<div className="flex-1 bg-editor-bg">
+			<div className="flex-1 bg-editor-bg overflow-hidden">
 				{isGenerating ? (
-					<div className="flex h-full items-center justify-center">
+					<div className="min-h-[calc(100vh-65px)] flex h-full items-center justify-center">
 						<div className="flex flex-col items-center gap-3">
 							<Loader2 size={40} stroke={2} speed={1} />
 							<p className="text-sm text-muted-foreground">Generating documentation...</p>
 						</div>
 					</div>
 				) : documentation ? (
-					<div className="p-4 h-full w-full overflow-auto text-sm leading-relaxed font-mono text-foreground">
+					<div className="max-h-[calc(100vh-65px)] p-4 w-full overflow-auto text-sm leading-relaxed font-mono text-foreground">
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}
 							components={{
