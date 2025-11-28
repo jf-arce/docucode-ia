@@ -1,7 +1,7 @@
 import { NewProjectButton } from "@/components/NewProjectButton";
 import { Input } from "./ui/input";
 import { FileTextIcon, GitHubIcon } from "./Icons";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { GitHubRepository, RepositoriesCombobox } from "./repositories-combobox";
 import { Button } from "./ui/button";
@@ -22,7 +22,7 @@ const getUserRepositories = async () => {
 	const { data: user } = await supabase
 		.from("user_profiles")
 		.select("github_token")
-		.eq("id", session.user.id)
+		.eq("user_id", session.user.id)
 		.single();
 
 	let tokenToUse = user?.github_token;
@@ -32,14 +32,14 @@ const getUserRepositories = async () => {
 		await supabase
 			.from("user_profiles")
 			.update({ github_token: providerToken })
-			.eq("id", session.user.id);
+			.eq("user_id", session.user.id);
 
 		tokenToUse = providerToken;
 	}
 
 	if (!tokenToUse) return [];
 
-	const res = await fetch("https://api.github.com/user/repos", {
+	const res = await fetch("https://api.github.com/user/repos?type=owner", {
 		headers: { Authorization: `Bearer ${tokenToUse}` },
 	});
 
@@ -48,6 +48,7 @@ const getUserRepositories = async () => {
 
 export const EmptyWorkspace = () => {
 	const [userRepositories, setUserRepositories] = useState([]);
+	const [loading, setLoading] = useState(true);
 	const [selectedTab, setSelectedTab] = useState<"github" | "url">("github");
 	const [repoSelected, setRepoSelected] = useState<GitHubRepository | null>(null);
 	const [urlSelected, setUrlSelected] = useState<string | null>(null);
@@ -55,7 +56,8 @@ export const EmptyWorkspace = () => {
 	useEffect(() => {
 		getUserRepositories()
 			.then((repos) => setUserRepositories(repos))
-			.catch(() => setUserRepositories([]));
+			.catch(() => setUserRepositories([]))
+			.finally(() => setLoading(false));
 	}, []);
 
 	console.log(userRepositories);
@@ -102,6 +104,7 @@ export const EmptyWorkspace = () => {
 								<RepositoriesCombobox
 									repoSelected={repoSelected}
 									repositories={userRepositories}
+									loading={loading}
 									onSelectRepo={(repo) => setRepoSelected(repo)}
 								/>
 							</div>

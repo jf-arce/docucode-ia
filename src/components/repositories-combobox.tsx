@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -14,8 +14,8 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Skeleton } from "./ui/skeleton";
-import { GitHubIcon } from "./Icons";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GitHubIcon } from "@/components/Icons";
 
 export interface GitHubRepository {
 	id: number;
@@ -28,19 +28,21 @@ export interface GitHubRepository {
 
 interface RepositoriesComboboxProps {
 	repositories: GitHubRepository[];
+	loading: boolean;
 	repoSelected: GitHubRepository | null;
 	onSelectRepo?: (repo: GitHubRepository) => void;
 }
 
 export function RepositoriesCombobox({
 	repositories,
+	loading,
 	repoSelected,
 	onSelectRepo,
 }: RepositoriesComboboxProps) {
-	const [open, setOpen] = React.useState(false);
-	const [selected, setSelected] = React.useState<GitHubRepository | null>(null);
+	const [open, setOpen] = useState(false);
+	const [selected, setSelected] = useState<GitHubRepository | null>(null);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		setSelected(repoSelected || null);
 	}, [repoSelected]);
 
@@ -69,20 +71,24 @@ export function RepositoriesCombobox({
 					<CommandInput placeholder="Search repositories..." />
 					<CommandList>
 						<CommandEmpty className="p-2">
-							<div className="flex flex-col gap-2">
-								<div className="flex items-center gap-2">
-									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-100" />
-									<Skeleton className="h-8 w-full delay-100" />
+							{loading ? (
+								<div className="flex flex-col gap-2">
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-100" />
+										<Skeleton className="h-8 w-full delay-100" />
+									</div>
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-300" />
+										<Skeleton className="h-8 w-full delay-300" />
+									</div>
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-500" />
+										<Skeleton className="h-8 w-full delay-500" />
+									</div>
 								</div>
-								<div className="flex items-center gap-2">
-									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-300" />
-									<Skeleton className="h-8 w-full delay-300" />
-								</div>
-								<div className="flex items-center gap-2">
-									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-500" />
-									<Skeleton className="h-8 w-full delay-500" />
-								</div>
-							</div>
+							) : (
+								<p className="text-center text-sm text-muted-foreground">No repositories found.</p>
+							)}
 						</CommandEmpty>
 
 						<CommandGroup>
