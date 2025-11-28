@@ -266,7 +266,7 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 					style={{
 						backgroundColor: "var(--background)",
 						color: "var(--foreground)",
-						height: "calc(100vh - 65px)",
+						height: "100%",
 					}}
 				/>
 			</div>
