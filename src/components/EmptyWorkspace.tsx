@@ -1,7 +1,7 @@
 import { NewProjectButton } from "@/components/NewProjectButton";
 import { Input } from "./ui/input";
 import { FileTextIcon, GitHubIcon } from "./Icons";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { GitHubRepository, RepositoriesCombobox } from "./repositories-combobox";
 import { Button } from "./ui/button";
@@ -15,16 +15,35 @@ const getUserRepositories = async () => {
 		data: { session },
 	} = await supabase.auth.getSession();
 
-	const githubToken = session?.provider_token;
-	console.log(githubToken);
-	if (!githubToken) return [];
+	if (!session) return [];
+
+	const providerToken = session.provider_token;
+
+	const { data: user } = await supabase
+		.from("user_profiles")
+		.select("github_token")
+		.eq("id", session.user.id)
+		.single();
+
+	let tokenToUse = user?.github_token;
+
+	if (providerToken && providerToken !== user?.github_token) {
+		// actualizar si hay uno nuevo
+		await supabase
+			.from("user_profiles")
+			.update({ github_token: providerToken })
+			.eq("id", session.user.id);
+
+		tokenToUse = providerToken;
+	}
+
+	if (!tokenToUse) return [];
 
 	const res = await fetch("https://api.github.com/user/repos", {
-		headers: {
-			Authorization: `Bearer ${githubToken}`,
-		},
+		headers: { Authorization: `Bearer ${tokenToUse}` },
 	});
-	return await res.json();
+
+	return res.ok ? res.json() : [];
 };
 
 export const EmptyWorkspace = () => {
@@ -34,7 +53,9 @@ export const EmptyWorkspace = () => {
 	const [urlSelected, setUrlSelected] = useState<string | null>(null);
 
 	useEffect(() => {
-		getUserRepositories().then((repos) => setUserRepositories(repos));
+		getUserRepositories()
+			.then((repos) => setUserRepositories(repos))
+			.catch(() => setUserRepositories([]));
 	}, []);
 
 	console.log(userRepositories);
@@ -77,7 +98,7 @@ export const EmptyWorkspace = () => {
 									<p className="text-md text-muted-foreground">Choose one of your repositories.</p>
 								</div>
 							</div>
-							<div className="mt-4">
+							<div className="mt-2">
 								<RepositoriesCombobox
 									repoSelected={repoSelected}
 									repositories={userRepositories}
@@ -91,7 +112,7 @@ export const EmptyWorkspace = () => {
 									<p className="text-md text-muted-foreground">Put a public repository link.</p>
 								</div>
 							</div>
-							<div className="mt-4">
+							<div className="mt-2">
 								<Input
 									placeholder="GitHub repository link"
 									value={urlSelected || ""}

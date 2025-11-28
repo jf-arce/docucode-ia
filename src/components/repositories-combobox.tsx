@@ -14,6 +14,8 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Skeleton } from "./ui/skeleton";
+import { GitHubIcon } from "./Icons";
 
 export interface GitHubRepository {
 	id: number;
@@ -66,11 +68,31 @@ export function RepositoriesCombobox({
 				<Command>
 					<CommandInput placeholder="Search repositories..." />
 					<CommandList>
-						<CommandEmpty>No repositories found.</CommandEmpty>
+						<CommandEmpty className="p-2">
+							<div className="flex flex-col gap-2">
+								<div className="flex items-center gap-2">
+									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-100" />
+									<Skeleton className="h-8 w-full delay-100" />
+								</div>
+								<div className="flex items-center gap-2">
+									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-300" />
+									<Skeleton className="h-8 w-full delay-300" />
+								</div>
+								<div className="flex items-center gap-2">
+									<GitHubIcon size={24} fill="gray" className="animate-pulse delay-500" />
+									<Skeleton className="h-8 w-full delay-500" />
+								</div>
+							</div>
+						</CommandEmpty>
 
 						<CommandGroup>
 							{repositories.map((repo) => (
-								<CommandItem key={repo.id} value={repo.name} onSelect={() => handleSelect(repo)}>
+								<CommandItem
+									key={repo.id}
+									value={repo.name}
+									onSelect={() => handleSelect(repo)}
+									className="cursor-pointer"
+								>
 									<CheckIcon
 										className={cn(
 											"mr-2 h-4 w-4",
@@ -78,7 +100,10 @@ export function RepositoriesCombobox({
 										)}
 									/>
 									<div className="flex flex-col">
-										<span>{repo.name}</span>
+										<span className="flex items-center gap-2">
+											<GitHubIcon size={24} fill="gray" />
+											{repo.name}
+										</span>
 
 										<span
 											className={cn(
