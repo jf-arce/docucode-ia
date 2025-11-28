@@ -26,12 +26,21 @@ export interface GitHubRepository {
 
 interface RepositoriesComboboxProps {
 	repositories: GitHubRepository[];
+	repoSelected: GitHubRepository | null;
 	onSelectRepo?: (repo: GitHubRepository) => void;
 }
 
-export function RepositoriesCombobox({ repositories, onSelectRepo }: RepositoriesComboboxProps) {
+export function RepositoriesCombobox({
+	repositories,
+	repoSelected,
+	onSelectRepo,
+}: RepositoriesComboboxProps) {
 	const [open, setOpen] = React.useState(false);
 	const [selected, setSelected] = React.useState<GitHubRepository | null>(null);
+
+	React.useEffect(() => {
+		setSelected(repoSelected || null);
+	}, [repoSelected]);
 
 	const handleSelect = (repo: GitHubRepository) => {
 		setSelected(repo);

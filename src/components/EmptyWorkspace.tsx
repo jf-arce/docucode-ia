@@ -3,10 +3,10 @@ import { Input } from "./ui/input";
 import { FileTextIcon, GitHubIcon } from "./Icons";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { RepositoriesCombobox } from "./repositories-combobox";
+import { GitHubRepository, RepositoriesCombobox } from "./repositories-combobox";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe } from "lucide-react";
+import { Globe, Sparkles } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 const getUserRepositories = async () => {
@@ -29,13 +29,23 @@ const getUserRepositories = async () => {
 
 export const EmptyWorkspace = () => {
 	const [userRepositories, setUserRepositories] = useState([]);
-	const [wasSelectedRepository, setWasSelectedRepository] = useState(false);
+	const [selectedTab, setSelectedTab] = useState<"github" | "url">("github");
+	const [repoSelected, setRepoSelected] = useState<GitHubRepository | null>(null);
+	const [urlSelected, setUrlSelected] = useState<string | null>(null);
 
 	useEffect(() => {
 		getUserRepositories().then((repos) => setUserRepositories(repos));
 	}, []);
 
 	console.log(userRepositories);
+
+	const handleSelectRepo = () => {
+		if (selectedTab === "github") {
+			console.log(repoSelected);
+		} else {
+			console.log(urlSelected);
+		}
+	};
 
 	return (
 		<div className="flex flex-1 items-center justify-center gap-6 mb-[70px]">
@@ -45,13 +55,13 @@ export const EmptyWorkspace = () => {
 					<h2 className="text-xl font-medium">Document your code from GitHub</h2>
 					<Tabs defaultValue="github" className="bg-background/80 p-4 rounded-lg">
 						<TabsList className="flex justify-center bg-black w-full">
-							<TabsTrigger value="github" asChild className="flex-1">
+							<TabsTrigger value="github" asChild onClick={() => setSelectedTab("github")}>
 								<div>
 									<GitHubIcon size={24} />
 									My Github
 								</div>
 							</TabsTrigger>
-							<TabsTrigger value="url" asChild className="flex-1">
+							<TabsTrigger value="url" asChild onClick={() => setSelectedTab("url")}>
 								<div>
 									<Globe size={24} />
 									From GitHub
@@ -69,8 +79,9 @@ export const EmptyWorkspace = () => {
 							</div>
 							<div className="mt-4">
 								<RepositoriesCombobox
+									repoSelected={repoSelected}
 									repositories={userRepositories}
-									onSelectRepo={(repo) => setWasSelectedRepository(repo ? true : false)}
+									onSelectRepo={(repo) => setRepoSelected(repo)}
 								/>
 							</div>
 						</TabsContent>
@@ -81,11 +92,25 @@ export const EmptyWorkspace = () => {
 								</div>
 							</div>
 							<div className="mt-4">
-								<Input placeholder="GitHub repository link" />
+								<Input
+									placeholder="GitHub repository link"
+									value={urlSelected || ""}
+									onChange={(e) => setUrlSelected(e.target.value)}
+								/>
 							</div>
 						</TabsContent>
 					</Tabs>
-					<Button disabled={!wasSelectedRepository}>Document</Button>
+					{selectedTab === "github" ? (
+						<Button disabled={!repoSelected} onClick={handleSelectRepo}>
+							<Sparkles className="h-4 w-4" />
+							Document
+						</Button>
+					) : (
+						<Button disabled={!urlSelected} onClick={handleSelectRepo}>
+							<Sparkles className="h-4 w-4" />
+							Document
+						</Button>
+					)}
 				</div>
 
 				<div className="flex items-center">
