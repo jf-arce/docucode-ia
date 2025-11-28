@@ -56,7 +56,7 @@ export async function signup(_previousState: PreviousState | null, formData: For
 
 	const { error: userProfileError } = await supabase
 		.from("user_profiles")
-		.insert({ id: user.user?.id, email: email });
+		.insert({ user_id: user.user?.id, email: email });
 
 	if (userProfileError) {
 		return { error: userProfileError.message, success: false };
