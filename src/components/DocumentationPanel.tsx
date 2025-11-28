@@ -17,9 +17,8 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import html2pdf from "html2pdf.js";
-
 import "github-markdown-css/github-markdown.css";
+import { exportAsMarkdown, exportAsPDF, exportAsHTML } from "@/utils/file-exports";
 
 interface DocumentationPanelProps {
 	documentation: string;
@@ -42,13 +41,13 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 
 			switch (format) {
 				case "markdown":
-					downloadAsMarkdown(documentation, filename);
+					exportAsMarkdown(documentation, filename);
 					break;
 				case "pdf":
-					downloadAsPDF(documentation, filename);
+					exportAsPDF(documentation, filename);
 					break;
 				case "html":
-					downloadAsHTML(documentation, filename);
+					exportAsHTML(documentation, filename);
 					break;
 				default:
 					throw new Error("Unsupported format");
@@ -65,157 +64,6 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 				duration: 3000,
 			});
 		}
-	};
-
-	const downloadAsMarkdown = (content: string, filename: string) => {
-		const blob = new Blob([content], { type: "text/markdown" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${filename}.md`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	};
-
-	const downloadAsPDF = (content: string, filename: string) => {
-		// Convertir Markdown a HTML usando ReactMarkdown de manera temporal
-		const tempContainer = document.createElement("div");
-		tempContainer.style.padding = "30px";
-		tempContainer.style.maxWidth = "800px";
-		tempContainer.style.fontFamily = "'Inter', 'Segoe UI', sans-serif";
-		tempContainer.style.lineHeight = "1.6";
-		tempContainer.style.backgroundColor = "#ffffff";
-		tempContainer.style.color = "#111827";
-		tempContainer.innerHTML = `
-		<h1 style="text-align:center; font-size: 22px; border-bottom: 2px solid #007acc; padding-bottom: 10px;">Code Documentation</h1>
-		<div id="markdown-content"></div>
-	`;
-
-		document.body.appendChild(tempContainer);
-
-		// Renderizamos el markdown dentro del div temporal
-		import("react-dom/server").then(({ renderToString }) => {
-			const html = renderToString(
-				<ReactMarkdown
-					remarkPlugins={[remarkGfm]}
-					components={{
-						code({
-							className,
-							children,
-							...props
-						}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
-							const match = /language-(\w+)/.exec(className || "");
-							const isInline = !(className && className.includes("language-"));
-							return !isInline && match ? (
-								<pre
-									style={{
-										background: "#1e1e1e",
-										color: "#dcdcdc",
-										padding: "10px",
-										borderRadius: "6px",
-										overflowX: "auto",
-										fontFamily: "'Fira Code', monospace",
-									}}
-								>
-									<code {...props}>{String(children).replace(/\n$/, "")}</code>
-								</pre>
-							) : (
-								<code
-									style={{
-										background: "#f4f4f4",
-										padding: "2px 4px",
-										borderRadius: "4px",
-										fontFamily: "'Fira Code', monospace",
-									}}
-									{...props}
-								>
-									{children}
-								</code>
-							);
-						},
-					}}
-				>
-					{content}
-				</ReactMarkdown>,
-			);
-
-			// Insertamos el HTML generado en el contenedor
-			const markdownContainer = tempContainer.querySelector("#markdown-content");
-			if (markdownContainer) markdownContainer.innerHTML = html;
-
-			html2pdf()
-				.set({
-					margin: 0.5,
-					filename: `${filename}.pdf`,
-					image: { type: "jpeg" as const, quality: 0.98 },
-					html2canvas: { scale: 2 },
-					jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-				})
-				.from(tempContainer)
-				.save()
-				.then(() => {
-					document.body.removeChild(tempContainer);
-				});
-		});
-	};
-
-	const downloadAsHTML = (content: string, filename: string) => {
-		// Convertir saltos de línea a <br> y envolver en HTML básico
-		const htmlContent = content.replace(/\n/g, "<br>");
-
-		const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Documentation</title>
-    <style>
-        body {
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #007acc;
-            padding-bottom: 10px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="content">
-        <h1>Code Documentation</h1>
-        <pre>${htmlContent}</pre>
-    </div>
-</body>
-</html>`;
-
-		const blob = new Blob([html], { type: "text/html" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${filename}.html`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
 	};
 
 	return (
