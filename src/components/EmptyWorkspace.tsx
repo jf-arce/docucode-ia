@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
 import { getUserRepositories } from "@/services/get-user-repositories";
 import { createGithubRepositoryDoc } from "@/data/github-repository-doc/create-github-repository-doc";
+import { useWorkspace } from "@/context/WorkspaceContext";
 
 export const EmptyWorkspace = () => {
 	const router = useRouter();
@@ -21,6 +22,7 @@ export const EmptyWorkspace = () => {
 
 	const [repositoriesLoading, setRepositoriesLoading] = useState(true);
 	const [createRepoDocLoading, setCreateRepoDocLoading] = useState(false);
+	const { updateRepoDoc } = useWorkspace();
 
 	useEffect(() => {
 		getUserRepositories()
@@ -35,6 +37,8 @@ export const EmptyWorkspace = () => {
 			const repoDoc = await createGithubRepositoryDoc(repoSelected);
 			setCreateRepoDocLoading(false);
 			if (!repoDoc) return;
+
+			updateRepoDoc(repoDoc);
 
 			router.push(`/workspace/repo/${repoDoc.id}`);
 		} else {

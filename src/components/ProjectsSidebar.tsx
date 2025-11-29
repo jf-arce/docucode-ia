@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GetProjectDto } from "@/types/project.types";
 import { useWorkspace } from "@/context/WorkspaceContext";
-import { UserProject } from "./UserProject";
-import { NewProjectButton } from "./NewProjectButton";
-import { SidebarUserMenu } from "./SidebarUserMenu";
+import { UserProject } from "@/components/UserProject";
+import { NewProjectButton } from "@/components/NewProjectButton";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { Code2, PanelLeftIcon, ChevronDown } from "lucide-react";
 import {
 	Sidebar,
@@ -25,8 +25,8 @@ import {
 	SidebarFooter,
 } from "@/components/ui/sidebar";
 import { GithubRepositoryDoc } from "@/types/github-repository-docs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { FileTextIcon } from "./Icons";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { UserRepoDoc } from "@/components/UserRepoDoc";
 
 interface ProjectsSidebarProps {
 	user: User;
@@ -41,10 +41,10 @@ export function ProjectsSidebar({
 }: ProjectsSidebarProps) {
 	const router = useRouter();
 	const isMobile = useIsMobile();
-	const { newDocument } = useWorkspace();
+	const { newDocument, repoDoc } = useWorkspace();
 	const { toggleSidebar, open } = useSidebar();
 
-	// Refrescar la página cuando se guarda un documento
+	// Actualiza el componente cuando se crea un nuevo documento
 	useEffect(() => {
 		if (newDocument.document.id && newDocument.document.title && typeof window !== "undefined") {
 			const timeoutId = setTimeout(() => {
@@ -53,7 +53,14 @@ export function ProjectsSidebar({
 
 			return () => clearTimeout(timeoutId);
 		}
-	}, [newDocument.document.id, newDocument.document.title, router]);
+		if (repoDoc && typeof window !== "undefined") {
+			const timeoutId = setTimeout(() => {
+				router.refresh();
+			}, 500);
+
+			return () => clearTimeout(timeoutId);
+		}
+	}, [newDocument.document.id, newDocument.document.title, router, repoDoc]);
 
 	return (
 		<Sidebar collapsible="icon">
@@ -138,16 +145,3 @@ export function ProjectsSidebar({
 		</Sidebar>
 	);
 }
-
-export const UserRepoDoc = ({ repoDoc }: { repoDoc: GithubRepositoryDoc }) => {
-	return (
-		<SidebarMenuItem>
-			<SidebarMenuButton className="cursor-pointer w-full" asChild>
-				<Link href={`/workspace/repo/${repoDoc.id}`}>
-					<FileTextIcon />
-					<span>{repoDoc.repo_name}</span>
-				</Link>
-			</SidebarMenuButton>
-		</SidebarMenuItem>
-	);
-};

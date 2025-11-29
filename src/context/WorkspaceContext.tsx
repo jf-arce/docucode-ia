@@ -1,5 +1,6 @@
 "use client";
 
+import { GithubRepositoryDoc } from "@/types/github-repository-docs";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface DocumentState {
@@ -19,10 +20,13 @@ interface WorkspaceState {
 	newDocument: DocumentState;
 	code: string;
 	documentation: string;
+	repoDoc: GithubRepositoryDoc | null;
 	updateNewDocument: (doc: DocumentState) => void;
 	updateCode: (code: string) => void;
 	updateDocumentation: (doc: string) => void;
 	resetNewDocument: () => void;
+	updateRepoDoc: (doc: GithubRepositoryDoc) => void;
+	resetRepoDoc: () => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceState | undefined>(undefined);
@@ -38,6 +42,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 			project_id: 0,
 		},
 	});
+
+	const [repoDoc, setRepoDoc] = useState<GithubRepositoryDoc | null>(null);
 
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
@@ -71,6 +77,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 		setDocumentation("");
 	};
 
+	const updateRepoDoc = (doc: GithubRepositoryDoc) => {
+		setRepoDoc(doc);
+	};
+
+	const resetRepoDoc = () => {
+		setRepoDoc(null);
+	};
+
 	return (
 		<WorkspaceContext.Provider
 			value={{
@@ -81,6 +95,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 				updateCode,
 				updateDocumentation,
 				resetNewDocument,
+				repoDoc,
+				updateRepoDoc,
+				resetRepoDoc,
 			}}
 		>
 			{children}
