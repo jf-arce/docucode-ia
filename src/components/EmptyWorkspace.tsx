@@ -10,7 +10,7 @@ import { Separator } from "./ui/separator";
 import { useRouter } from "next/navigation";
 import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
 import { getUserRepositories } from "@/services/get-user-repositories";
-import { createGithubRepositoryDoc } from "@/services/create-github-repository-doc";
+import { createGithubRepositoryDoc } from "@/data/github-repository-doc/create-github-repository-doc";
 
 export const EmptyWorkspace = () => {
 	const router = useRouter();

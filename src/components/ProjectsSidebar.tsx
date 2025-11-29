@@ -9,7 +9,7 @@ import { useWorkspace } from "@/context/WorkspaceContext";
 import { UserProject } from "./UserProject";
 import { NewProjectButton } from "./NewProjectButton";
 import { SidebarUserMenu } from "./SidebarUserMenu";
-import { Code2, PanelLeftIcon } from "lucide-react";
+import { Code2, PanelLeftIcon, ChevronDown } from "lucide-react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -24,13 +24,21 @@ import {
 	SidebarTrigger,
 	SidebarFooter,
 } from "@/components/ui/sidebar";
+import { GithubRepositoryDoc } from "@/types/github-repository-docs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { FileTextIcon } from "./Icons";
 
 interface ProjectsSidebarProps {
 	user: User;
 	userProjectsData: GetProjectDto[];
+	userRepoDocsData: GithubRepositoryDoc[];
 }
 
-export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps) {
+export function ProjectsSidebar({
+	user,
+	userProjectsData,
+	userRepoDocsData,
+}: ProjectsSidebarProps) {
 	const router = useRouter();
 	const isMobile = useIsMobile();
 	const { newDocument } = useWorkspace();
@@ -72,20 +80,50 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 			</SidebarHeader>
 
 			<SidebarContent className="overflow-hidden">
-				<SidebarGroup>
-					<SidebarGroupLabel className="text-sm font-medium">Projects</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<NewProjectButton />
-							</SidebarMenuItem>
+				<Collapsible defaultOpen className="group/collapsible">
+					<SidebarGroup>
+						<SidebarGroupLabel asChild>
+							<CollapsibleTrigger>
+								Projects
+								<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
 
-							{userProjectsData.map((project) => (
-								<UserProject key={project.id} project={project} />
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<NewProjectButton />
+									</SidebarMenuItem>
+
+									{userProjectsData.map((project) => (
+										<UserProject key={project.id} project={project} />
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
+
+				<Collapsible defaultOpen className="group/collapsible">
+					<SidebarGroup>
+						<SidebarGroupLabel asChild>
+							<CollapsibleTrigger>
+								Repositories
+								<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									{userRepoDocsData.map((repoDoc) => (
+										<UserRepoDoc key={repoDoc.id} repoDoc={repoDoc} />
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
 			</SidebarContent>
 
 			{!isMobile && (
@@ -100,3 +138,16 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 		</Sidebar>
 	);
 }
+
+export const UserRepoDoc = ({ repoDoc }: { repoDoc: GithubRepositoryDoc }) => {
+	return (
+		<SidebarMenuItem>
+			<SidebarMenuButton className="cursor-pointer w-full" asChild>
+				<Link href={`/workspace/repo/${repoDoc.id}`}>
+					<FileTextIcon />
+					<span>{repoDoc.repo_name}</span>
+				</Link>
+			</SidebarMenuButton>
+		</SidebarMenuItem>
+	);
+};

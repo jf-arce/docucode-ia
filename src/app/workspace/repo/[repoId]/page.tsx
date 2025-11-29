@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { GithubRepositoryDoc } from "@/types/github-repository-docs";
 import { createClient } from "@/utils/supabase/server";
 import { Sparkles } from "lucide-react";
-
-import { RepoDocLoader } from "@/components/RepoDocLoader";
+import { DocumentationPanel } from "@/components/DocumentationPanel";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { notFound } from "next/navigation";
+import { RepoDocStatusChecker } from "@/components/RepoDocStatusChecker";
 
 interface DocumentPageProps {
 	params: Promise<{ repoId: string }>;
@@ -22,23 +25,40 @@ export default async function RepoDocPreviewPage({ params }: DocumentPageProps) 
 
 	const repoDoc = data as GithubRepositoryDoc;
 
-	if (error) return <div>Error al cargar documentación.</div>;
+	if (error) return notFound();
 
-	if (!repoDoc.documentation || !repoDoc.is_generated)
-		return <RepoDocLoader githubRepositoryDoc={repoDoc} />;
+	if (!repoDoc.is_generated) {
+		return <RepoDocStatusChecker initialDoc={repoDoc} />;
+	}
+
+	const documentationContent = repoDoc.documentation || "";
 
 	return (
-		<section className="px-10 py-5">
-			<nav className="flex justify-between">
-				<h1 className="text-2xl font-bold mb-4">Documentación de {repoDoc.repo_name}</h1>
+		<div className="flex flex-col h-screen overflow-hidden bg-background">
+			<header className="flex items-center justify-between border-b border-border px-6 py-4 shrink-0">
+				<div className="flex items-center gap-4">
+					<Link
+						href="/workspace"
+						className="text-muted-foreground hover:text-foreground transition-colors"
+					>
+						<ArrowLeft className="h-5 w-5" />
+					</Link>
+					<h1 className="text-xl font-bold tracking-tight">Documentation of {repoDoc.repo_name}</h1>
+				</div>
 
 				<form action={`/docs/${repoId}/document`} method="POST">
-					<Button type="submit">
+					<Button type="submit" variant="default" className="gap-2">
 						<Sparkles className="h-4 w-4" />
-						Documentar de nuevo
+						Regenerate Documentation
 					</Button>
 				</form>
-			</nav>
-		</section>
+			</header>
+
+			<main className="flex flex-1 overflow-hidden">
+				<div className="flex-1 overflow-y-auto">
+					<DocumentationPanel documentation={documentationContent} isGenerating={false} />
+				</div>
+			</main>
+		</div>
 	);
 }
