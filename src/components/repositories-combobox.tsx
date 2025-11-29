@@ -16,21 +16,13 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GitHubIcon } from "@/components/Icons";
-
-export interface GitHubRepository {
-	id: number;
-	name: string;
-	private: boolean;
-	html_url: string;
-	description: string | null;
-	language: string | null;
-}
+import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
 
 interface RepositoriesComboboxProps {
-	repositories: GitHubRepository[];
+	repositories: UserGithubRepositoryResponse[];
 	loading: boolean;
-	repoSelected: GitHubRepository | null;
-	onSelectRepo?: (repo: GitHubRepository) => void;
+	repoSelected: UserGithubRepositoryResponse | null;
+	onSelectRepo?: (repo: UserGithubRepositoryResponse) => void;
 }
 
 export function RepositoriesCombobox({
@@ -40,13 +32,13 @@ export function RepositoriesCombobox({
 	onSelectRepo,
 }: RepositoriesComboboxProps) {
 	const [open, setOpen] = useState(false);
-	const [selected, setSelected] = useState<GitHubRepository | null>(null);
+	const [selected, setSelected] = useState<UserGithubRepositoryResponse | null>(null);
 
 	useEffect(() => {
 		setSelected(repoSelected || null);
 	}, [repoSelected]);
 
-	const handleSelect = (repo: GitHubRepository) => {
+	const handleSelect = (repo: UserGithubRepositoryResponse) => {
 		setSelected(repo);
 		setOpen(false);
 		onSelectRepo?.(repo);

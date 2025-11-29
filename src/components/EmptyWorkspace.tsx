@@ -2,69 +2,41 @@ import { NewProjectButton } from "@/components/NewProjectButton";
 import { Input } from "./ui/input";
 import { FileTextIcon, GitHubIcon } from "./Icons";
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
-import { GitHubRepository, RepositoriesCombobox } from "./repositories-combobox";
+import { RepositoriesCombobox } from "./repositories-combobox";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, Sparkles } from "lucide-react";
+import { Globe, Loader2Icon, Sparkles } from "lucide-react";
 import { Separator } from "./ui/separator";
-
-const getUserRepositories = async () => {
-	const supabase = createClient();
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
-
-	if (!session) return [];
-
-	const providerToken = session.provider_token;
-
-	const { data: user } = await supabase
-		.from("user_profiles")
-		.select("github_token")
-		.eq("user_id", session.user.id)
-		.single();
-
-	let tokenToUse = user?.github_token;
-
-	if (providerToken && providerToken !== user?.github_token) {
-		// actualizar si hay uno nuevo
-		await supabase
-			.from("user_profiles")
-			.update({ github_token: providerToken })
-			.eq("user_id", session.user.id);
-
-		tokenToUse = providerToken;
-	}
-
-	if (!tokenToUse) return [];
-
-	const res = await fetch("https://api.github.com/user/repos?type=owner", {
-		headers: { Authorization: `Bearer ${tokenToUse}` },
-	});
-
-	return res.ok ? res.json() : [];
-};
+import { useRouter } from "next/navigation";
+import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
+import { getUserRepositories } from "@/services/get-user-repositories";
+import { createGithubRepositoryDoc } from "@/services/create-github-repository-doc";
 
 export const EmptyWorkspace = () => {
+	const router = useRouter();
 	const [userRepositories, setUserRepositories] = useState([]);
-	const [loading, setLoading] = useState(true);
 	const [selectedTab, setSelectedTab] = useState<"github" | "url">("github");
-	const [repoSelected, setRepoSelected] = useState<GitHubRepository | null>(null);
+	const [repoSelected, setRepoSelected] = useState<UserGithubRepositoryResponse | null>(null);
 	const [urlSelected, setUrlSelected] = useState<string | null>(null);
+
+	const [repositoriesLoading, setRepositoriesLoading] = useState(true);
+	const [createRepoDocLoading, setCreateRepoDocLoading] = useState(false);
 
 	useEffect(() => {
 		getUserRepositories()
 			.then((repos) => setUserRepositories(repos))
 			.catch(() => setUserRepositories([]))
-			.finally(() => setLoading(false));
+			.finally(() => setRepositoriesLoading(false));
 	}, []);
 
-	console.log(userRepositories);
+	const handleSelectRepo = async () => {
+		if (selectedTab === "github" && repoSelected) {
+			setCreateRepoDocLoading(true);
+			const repoDoc = await createGithubRepositoryDoc(repoSelected);
+			setCreateRepoDocLoading(false);
+			if (!repoDoc) return;
 
-	const handleSelectRepo = () => {
-		if (selectedTab === "github") {
-			console.log(repoSelected);
+			router.push(`/workspace/repo/${repoDoc.id}`);
 		} else {
 			console.log(urlSelected);
 		}
@@ -104,7 +76,7 @@ export const EmptyWorkspace = () => {
 								<RepositoriesCombobox
 									repoSelected={repoSelected}
 									repositories={userRepositories}
-									loading={loading}
+									loading={repositoriesLoading}
 									onSelectRepo={(repo) => setRepoSelected(repo)}
 								/>
 							</div>
@@ -125,8 +97,12 @@ export const EmptyWorkspace = () => {
 						</TabsContent>
 					</Tabs>
 					{selectedTab === "github" ? (
-						<Button disabled={!repoSelected} onClick={handleSelectRepo}>
-							<Sparkles className="h-4 w-4" />
+						<Button disabled={!repoSelected || createRepoDocLoading} onClick={handleSelectRepo}>
+							{createRepoDocLoading ? (
+								<Loader2Icon className="h-4 w-4 animate-spin" />
+							) : (
+								<Sparkles className="h-4 w-4" />
+							)}
 							Document
 						</Button>
 					) : (
