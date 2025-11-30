@@ -1,13 +1,13 @@
 "use client";
 
-import { useGenerateDocumentation } from "@/hooks/use-generate-documentation";
+import { useGenerateSnippetDocumentation } from "@/hooks/use-generate-snippet-documentation";
 import { CodeEditor } from "./CodeEditor";
 import { DocumentationPanel } from "./DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
 
 export const CodeAndDocumentationLayout = () => {
 	const { code, documentation } = useWorkspace();
-	const { isGenerating, handleGenerate } = useGenerateDocumentation();
+	const { isGenerating, handleGenerate } = useGenerateSnippetDocumentation();
 
 	return (
 		<div className="flex flex-col lg:flex-row flex-1 overflow-hidden h-full">

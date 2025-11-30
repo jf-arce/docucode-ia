@@ -38,12 +38,13 @@ export const GithubRepoDocStarter = () => {
 		if (selectedTab === "github" && repoSelected) {
 			setCreateRepoDocLoading(true);
 			const repoDoc = await createGithubRepositoryDoc(repoSelected);
-			setCreateRepoDocLoading(false);
 			if (!repoDoc) return;
 
 			updateRepoDoc(repoDoc);
 
 			router.push(`/workspace/repo/${repoDoc.id}`);
+
+			setCreateRepoDocLoading(false);
 
 			generateGitHubRepositoryDocumentation(repoSelected.html_url)
 				.then(async (documentation) => {

@@ -16,7 +16,7 @@ export interface Document {
 
 export type GetDocumentDto = Omit<Document, "created_at" | "snippet_id">;
 
-export type GenerateDocumentation = {
+export type GenerateSnippetDocumentation = {
 	snippet: {
 		language: string;
 		code: string;

@@ -1,7 +1,7 @@
 import { useWorkspace } from "@/context/WorkspaceContext";
 import { updateDocumentAction } from "@/actions/updateDocument.action";
 import { createDocumentAction } from "@/actions/createDocument.action";
-import { generateDocumentation } from "@/services/generate-documentation";
+import { generateSnippetDocumentation } from "@/services/generate-snippet-documentation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,7 +10,7 @@ import { useState } from "react";
  * Custom hook to fetch and generate documentation for the current code snippet.
  */
 
-export const useGenerateDocumentation = () => {
+export const useGenerateSnippetDocumentation = () => {
 	const router = useRouter();
 	const [isGenerating, setIsGenerating] = useState(false);
 	const { newDocument, updateNewDocument, code, updateDocumentation } = useWorkspace();
@@ -30,7 +30,7 @@ export const useGenerateDocumentation = () => {
 			const editorLanguage = localStorage.getItem("editor-language") || "typescript";
 
 			if (newDocument.document.id) {
-				const documentation = await generateDocumentation({
+				const documentation = await generateSnippetDocumentation({
 					snippet: { language: editorLanguage, code: code },
 					document: { title: newDocument.document.title, language: "en" },
 				});
@@ -53,7 +53,7 @@ export const useGenerateDocumentation = () => {
 					duration: 4000,
 				});
 			} else {
-				const documentation = await generateDocumentation({
+				const documentation = await generateSnippetDocumentation({
 					snippet: { language: editorLanguage, code: code },
 					document: { title: newDocument.document.title, language: "en" },
 				});
