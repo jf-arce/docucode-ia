@@ -4,12 +4,10 @@ import { ChevronRight, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useWorkspace } from "@/context/WorkspaceContext";
 import { useParams, useRouter } from "next/navigation";
 import { deleteProjectAction } from "@/actions/deleteProject.action";
 import { NewDocumentButton } from "./NewDocumentButton";
 import { ProjectDocument } from "./ProjectDocument";
-import { UnsavedProjectDocument } from "./UnsavedProjectDocument";
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -41,7 +39,7 @@ interface UserProjectsProps {
 export const UserProject = ({ project }: UserProjectsProps) => {
 	const router = useRouter();
 	const { open } = useSidebar();
-	const { newDocument, updateNewDocument } = useWorkspace();
+	// const { newDocument, updateNewDocument } = useWorkspace();
 	const [deleteProjectId, setDeleteProjectId] = useState<number | null>(null);
 	const { documentId: currentDocumentId } = useParams();
 
@@ -64,14 +62,6 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 				description: "Project and all its documents have been deleted.",
 				duration: 3000,
 			});
-
-			// Si el proyecto eliminado contenía el documento actual, limpiar el contexto
-			if (newDocument.document.project_id === deleteProjectId) {
-				updateNewDocument({
-					snippet: { language: "", code: "" },
-					document: { title: "", project_id: 0 },
-				});
-			}
 
 			router.refresh();
 		} catch (error) {
@@ -133,29 +123,6 @@ export const UserProject = ({ project }: UserProjectsProps) => {
 										<ProjectDocument document={document} project={project} />
 									</SidebarMenuSubItem>
 								))}
-
-							{newDocument.document.title && newDocument.document.project_id === project.id && (
-								<SidebarMenuSubItem>
-									{!newDocument.document.id ? (
-										<UnsavedProjectDocument />
-									) : (
-										// Display the newDocument only if it's not already in the backend project documents
-										!project.documents.some((doc) => doc.id === newDocument.document.id) && (
-											<ProjectDocument
-												document={{
-													id: newDocument.document.id,
-													title: newDocument.document.title,
-													content: newDocument.document.content || "",
-													project_id: newDocument.document.project_id,
-													created_at: new Date().toISOString(),
-													snippet_id: 0,
-												}}
-												project={project}
-											/>
-										)
-									)}
-								</SidebarMenuSubItem>
-							)}
 						</SidebarMenuSub>
 					</CollapsibleContent>
 				</SidebarMenuItem>

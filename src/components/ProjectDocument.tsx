@@ -1,4 +1,3 @@
-import { useWorkspace } from "@/context/WorkspaceContext";
 import { SidebarMenuButton, useSidebar } from "./ui/sidebar";
 import { FileText, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -31,7 +30,6 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 	const router = useRouter();
 	const isMobile = useIsMobile();
 	const { open, toggleSidebar } = useSidebar();
-	const { newDocument, updateNewDocument } = useWorkspace();
 	const [deleteDocumentId, setDeleteDocumentId] = useState<number | null>(null);
 
 	const handleDeleteDocument = async () => {
@@ -51,14 +49,6 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 				description: "Document has been deleted.",
 				duration: 3000,
 			});
-
-			// Si el documento eliminado es el documento actual, limpiar el contexto
-			if (newDocument.document.id === deleteDocumentId) {
-				updateNewDocument({
-					snippet: { language: "", code: "" },
-					document: { title: "", project_id: 0 },
-				});
-			}
 
 			router.push(`/workspace`);
 		} catch (error) {
@@ -80,9 +70,7 @@ export const ProjectDocument = ({ document, project }: ProjectDocumentProps) => 
 					<div className="flex items-center w-full group/document gap-3">
 						<SidebarMenuButton
 							asChild
-							className={`flex-1 ${
-								newDocument.document.id === document.id ? "bg-accent text-accent-foreground" : ""
-							}`}
+							className="flex-1"
 							onClick={() => {
 								if (isMobile) {
 									toggleSidebar();

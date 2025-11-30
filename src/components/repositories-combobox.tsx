@@ -1,0 +1,123 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GitHubIcon } from "@/components/Icons";
+import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
+
+interface RepositoriesComboboxProps {
+	repositories: UserGithubRepositoryResponse[];
+	loading: boolean;
+	repoSelected: UserGithubRepositoryResponse | null;
+	onSelectRepo?: (repo: UserGithubRepositoryResponse) => void;
+}
+
+export function RepositoriesCombobox({
+	repositories,
+	loading,
+	repoSelected,
+	onSelectRepo,
+}: RepositoriesComboboxProps) {
+	const [open, setOpen] = useState(false);
+	const [selected, setSelected] = useState<UserGithubRepositoryResponse | null>(null);
+
+	useEffect(() => {
+		setSelected(repoSelected || null);
+	}, [repoSelected]);
+
+	const handleSelect = (repo: UserGithubRepositoryResponse) => {
+		setSelected(repo);
+		setOpen(false);
+		onSelectRepo?.(repo);
+	};
+
+	return (
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<Button
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className="w-full justify-between"
+				>
+					{selected ? selected.name : "Select a repository..."}
+					<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+				</Button>
+			</PopoverTrigger>
+
+			<PopoverContent className="w-[280px] p-0">
+				<Command>
+					<CommandInput placeholder="Search repositories..." />
+					<CommandList>
+						<CommandEmpty className="p-2">
+							{loading ? (
+								<div className="flex flex-col gap-2">
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-100" />
+										<Skeleton className="h-8 w-full delay-100" />
+									</div>
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-300" />
+										<Skeleton className="h-8 w-full delay-300" />
+									</div>
+									<div className="flex items-center gap-2">
+										<GitHubIcon size={24} fill="gray" className="animate-pulse delay-500" />
+										<Skeleton className="h-8 w-full delay-500" />
+									</div>
+								</div>
+							) : (
+								<p className="text-center text-sm text-muted-foreground">No repositories found.</p>
+							)}
+						</CommandEmpty>
+
+						<CommandGroup>
+							{repositories.map((repo) => (
+								<CommandItem
+									key={repo.id}
+									value={repo.name}
+									onSelect={() => handleSelect(repo)}
+									className="cursor-pointer"
+								>
+									<CheckIcon
+										className={cn(
+											"mr-2 h-4 w-4",
+											selected?.id === repo.id ? "opacity-100" : "opacity-0",
+										)}
+									/>
+									<div className="flex flex-col">
+										<span className="flex items-center gap-2">
+											<GitHubIcon size={24} fill="gray" />
+											{repo.name}
+										</span>
+
+										<span
+											className={cn(
+												"text-xs",
+												repo.private ? "text-red-500" : "text-muted-foreground",
+											)}
+										>
+											{repo.private ? "Private" : "Public"}
+										</span>
+									</div>
+								</CommandItem>
+							))}
+						</CommandGroup>
+					</CommandList>
+				</Command>
+			</PopoverContent>
+		</Popover>
+	);
+}

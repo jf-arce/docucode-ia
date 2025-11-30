@@ -48,10 +48,18 @@ export async function signup(_previousState: PreviousState | null, formData: For
 		},
 	};
 
-	const { error } = await supabase.auth.signUp(data);
+	const { data: user, error } = await supabase.auth.signUp(data);
 
 	if (error) {
-		return { error: error.message, success: false };
+		return { error: error?.message, success: false };
+	}
+
+	const { error: userProfileError } = await supabase
+		.from("user_profiles")
+		.insert({ user_id: user.user?.id, email: email });
+
+	if (userProfileError) {
+		return { error: userProfileError.message, success: false };
 	}
 
 	return { error: null, success: true };

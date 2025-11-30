@@ -45,10 +45,10 @@ import "ace-builds/src-noconflict/theme-clouds";
 import "ace-builds/src-noconflict/theme-solarized_light";
 
 import { useTheme } from "next-themes";
-import { useWorkspace } from "@/context/WorkspaceContext";
 
 interface CodeEditorProps {
 	code: string;
+	onCodeChange: (code: string) => void;
 	onGenerate: () => void;
 	isGenerating: boolean;
 }
@@ -56,10 +56,9 @@ interface CodeEditorProps {
 const DEFAULT_THEME = "one_dark";
 const DEFAULT_LANGUAGE = "typescript";
 
-export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) {
+export function CodeEditor({ code, onCodeChange, onGenerate, isGenerating }: CodeEditorProps) {
 	const currentTheme = useTheme();
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { updateCode } = useWorkspace();
 
 	const [codeEditorTheme, setCodeEditorTheme] = useState(() => {
 		return localStorage.getItem("editor-theme") || DEFAULT_THEME;
@@ -77,7 +76,7 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 	}, [codeEditorTheme]);
 
 	const handleChange = (value: string) => {
-		updateCode(value);
+		onCodeChange(value);
 	};
 
 	const handleUploadClick = () => {
@@ -134,7 +133,7 @@ export function CodeEditor({ code, onGenerate, isGenerating }: CodeEditorProps) 
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const content = e.target?.result as string;
-			updateCode(content);
+			onCodeChange(content);
 
 			// Detectar y establecer el lenguaje automáticamente
 			const detectedLanguage = detectLanguageFromExtension(file.name);
