@@ -1,12 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+import { Code2Icon } from "lucide-react";
 import { CodeEditor } from "@/components/CodeEditor";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
 import { useGenerateDocumentation } from "@/hooks/use-generate-documentation";
-import { EmptyWorkspace } from "@/components/EmptyWorkspace";
-import { useEffect } from "react";
-import { Code2Icon } from "lucide-react";
+import { DocumentationStarter } from "@/components/DocumentationStarter";
+import { WorkspaceBackground } from "@/components/WorkspaceBackground";
 
 export default function WorkspacePage() {
 	const { newDocument, code, documentation, resetNewDocument } = useWorkspace();
@@ -36,22 +37,11 @@ export default function WorkspacePage() {
 						<h1 className="text-md font-medium text-center">Welcome to DocuCode AI</h1>
 						<Code2Icon className="mx-auto text-primary/50 size-5" />
 					</div>
-					<EmptyWorkspace />
+					<DocumentationStarter />
 				</div>
 			)}
-			<div className="min-h-screen w-full absolute -z-50">
-				<div
-					className="absolute inset-0 z-0"
-					style={{
-						backgroundImage: `
-       radial-gradient(circle at 30% 30%, #222222 0.5px, transparent 1px),
-       radial-gradient(circle at 75% 75%, #111111 0.5px, transparent 1px)
-     `,
-						backgroundSize: "10px 10px",
-						imageRendering: "pixelated",
-					}}
-				/>
-			</div>
+
+			<WorkspaceBackground />
 		</div>
 	);
 }

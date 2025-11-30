@@ -15,7 +15,7 @@ import { useWorkspace } from "@/context/WorkspaceContext";
 import { generateGitHubRepositoryDocumentation } from "@/services/generate-github-documentation";
 import { updateGithubRepositoryDoc } from "@/data/github-repository-doc/update-github-repository-doc";
 
-export const EmptyWorkspace = () => {
+export const DocumentationStarter = () => {
 	const router = useRouter();
 	const [userRepositories, setUserRepositories] = useState([]);
 	const [selectedTab, setSelectedTab] = useState<"github" | "url">("github");
