@@ -1,11 +1,8 @@
 "use client";
-import { useEffect } from "react";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GetProjectDto } from "@/types/project.types";
-import { useWorkspace } from "@/context/WorkspaceContext";
 import { UserProject } from "@/components/UserProject";
 import { NewProjectButton } from "@/components/NewProjectButton";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
@@ -39,28 +36,8 @@ export function ProjectsSidebar({
 	userProjectsData,
 	userRepoDocsData,
 }: ProjectsSidebarProps) {
-	const router = useRouter();
 	const isMobile = useIsMobile();
-	const { newDocument, repoDoc } = useWorkspace();
 	const { toggleSidebar, open } = useSidebar();
-
-	// Actualiza el componente cuando se crea un nuevo documento
-	useEffect(() => {
-		if (newDocument.document.id && newDocument.document.title && typeof window !== "undefined") {
-			const timeoutId = setTimeout(() => {
-				router.refresh();
-			}, 500);
-
-			return () => clearTimeout(timeoutId);
-		}
-		if (repoDoc && typeof window !== "undefined") {
-			const timeoutId = setTimeout(() => {
-				router.refresh();
-			}, 500);
-
-			return () => clearTimeout(timeoutId);
-		}
-	}, [newDocument.document.id, newDocument.document.title, router, repoDoc]);
 
 	return (
 		<Sidebar collapsible="icon">

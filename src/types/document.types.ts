@@ -28,13 +28,10 @@ export type GenerateSnippetDocumentation = {
 };
 
 export type CreateDocument = {
-	snippet: {
-		language: string;
-		code: string;
-	};
-	document: {
-		title: string;
-		project_id: number;
-		content: string;
-	};
+	title: string;
+	project_id: number;
+	content?: string;
+	snippet_id?: number;
 };
+
+export type UpdateDocument = Partial<CreateDocument>;

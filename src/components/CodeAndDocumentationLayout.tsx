@@ -4,10 +4,11 @@ import { useGenerateSnippetDocumentation } from "@/hooks/use-generate-snippet-do
 import { CodeEditor } from "./CodeEditor";
 import { DocumentationPanel } from "./DocumentationPanel";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { Document } from "@/types/document.types";
 
-export const CodeAndDocumentationLayout = () => {
+export const CodeAndDocumentationLayout = ({ document }: { document: Document }) => {
 	const { code, documentation } = useWorkspace();
-	const { isGenerating, handleGenerate } = useGenerateSnippetDocumentation();
+	const { isGenerating, handleGenerate } = useGenerateSnippetDocumentation({ document });
 
 	return (
 		<div className="flex flex-col lg:flex-row flex-1 overflow-hidden h-full">

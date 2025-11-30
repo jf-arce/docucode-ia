@@ -9,7 +9,7 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
@@ -17,6 +17,8 @@ import { useWorkspace } from "@/context/WorkspaceContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "./ui/button";
 import { GetProjectDto } from "@/types/project.types";
+import { createDocumentAction } from "@/actions/createDocument.action";
+import { useRouter } from "next/navigation";
 
 interface NewDocumentButtonProps {
 	project: GetProjectDto;
@@ -25,8 +27,11 @@ interface NewDocumentButtonProps {
 export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 	const [isDialogOpen, setIsDialogOpen] = useState<{ [key: number]: boolean }>({});
 	const { toggleSidebar } = useSidebar();
-	const { updateNewDocument, updateCode, updateDocumentation } = useWorkspace();
+	const { updateCode, updateDocumentation } = useWorkspace();
+
 	const isMobile = useIsMobile();
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent, projectId: number) => {
 		e.preventDefault();
@@ -41,23 +46,27 @@ export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 			return;
 		}
 
-		const codeLenguage = localStorage.getItem("editor-language") || "typescript";
-		updateNewDocument({
-			snippet: {
-				language: codeLenguage,
-				code: "",
-			},
-			document: {
-				title: title,
-				project_id: projectId,
-				content: "",
-			},
+		setLoading(true);
+		const { error, document } = await createDocumentAction({
+			title,
+			project_id: projectId,
 		});
+
+		if (error || !document) {
+			toast.error("Failed to create document", {
+				description: error,
+				duration: 3000,
+			});
+			return;
+		}
 
 		updateCode("");
 		updateDocumentation("");
 
+		router.push(`/workspace/p-${document.project_id}/d/${document.id}`);
+
 		setIsDialogOpen({ ...isDialogOpen, [projectId]: false });
+		setLoading(false);
 
 		if (isMobile) {
 			toggleSidebar();
@@ -99,7 +108,16 @@ export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 							>
 								Cancel
 							</Button>
-							<Button type="submit">Create Document</Button>
+							<Button type="submit" disabled={loading}>
+								{loading ? (
+									<>
+										<Loader2 className="h-4 w-4 animate-spin" />
+										Creating...
+									</>
+								) : (
+									"Create Document"
+								)}
+							</Button>
 						</DialogFooter>
 					</form>
 				</DialogContent>
