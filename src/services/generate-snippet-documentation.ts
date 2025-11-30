@@ -1,11 +1,13 @@
-import { GenerateDocumentation } from "@/types/document.types";
+import { GenerateSnippetDocumentation } from "@/types/document.types";
 
-export const generateDocumentation = async (generateDocumentation: GenerateDocumentation) => {
+export const generateSnippetDocumentation = async (
+	generateDocumentation: GenerateSnippetDocumentation,
+) => {
 	const { language: snippetLanguage, code: snippetCode } = generateDocumentation.snippet;
 	const { language: documentLanguage, title } = generateDocumentation.document;
 
 	try {
-		const response = await fetch("/api/generate-document", {
+		const response = await fetch("/api/generate-snippet-documentation", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

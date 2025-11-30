@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { ProjectsSidebar } from "@/components/ProjectsSidebar";
 import { NavbarWorkspaceWrapper } from "@/components/NavbarWorkspaceWrapper";
 import { getProjectsData } from "@/data/project/getProject.data";
-import { WorkspaceProvider } from "@/context/WorkspaceContext";
+import { getGithubRepositoryDocsByUser } from "@/data/github-repository-doc/get-github-repository-docs-by-user";
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
 	const supabase = await createClient();
@@ -14,18 +14,21 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 	}
 
 	const userProjectsData = await getProjectsData(data.user.id);
+	const userRepoDocsData = await getGithubRepositoryDocsByUser(data.user.id);
 
 	return (
-		<div className="flex">
-			<WorkspaceProvider>
-				<div className="relative">
-					<ProjectsSidebar user={data?.user} userProjectsData={userProjectsData} />
-				</div>
-				<div className="flex-1 min-h-screen">
-					<NavbarWorkspaceWrapper user={data?.user} />
-					{children}
-				</div>
-			</WorkspaceProvider>
+		<div className="fixed inset-0 flex overflow-hidden bg-background">
+			<div className="relative h-full">
+				<ProjectsSidebar
+					user={data?.user}
+					userProjectsData={userProjectsData}
+					userRepoDocsData={userRepoDocsData}
+				/>
+			</div>
+			<div className="flex-1 flex flex-col h-full overflow-hidden">
+				<NavbarWorkspaceWrapper user={data?.user} />
+				<main className="flex-1 flex flex-col overflow-hidden relative">{children}</main>
+			</div>
 		</div>
 	);
 }

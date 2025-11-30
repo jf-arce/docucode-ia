@@ -1,51 +1,29 @@
 "use client";
 
-import { CodeEditor } from "@/components/CodeEditor";
-import { useEffect } from "react";
-import { DocumentationPanel } from "@/components/DocumentationPanel";
-import { useWorkspace } from "@/context/WorkspaceContext";
+import { useEffect, useState } from "react";
 import { Document } from "@/types/document.types";
-import { useGenerateDocumentation } from "@/hooks/use-generate-documentation";
+import { CodeAndDocumentationLayout } from "@/components/CodeAndDocumentationLayout";
 
 interface DocumentScreenProps {
 	document: Document;
 }
 
 export const DocumentScreen = ({ document }: DocumentScreenProps) => {
-	const { updateNewDocument, code, updateCode, documentation, updateDocumentation } =
-		useWorkspace();
-
-	const { isGenerating, handleGenerate } = useGenerateDocumentation();
+	const [code, setCode] = useState<string>("");
+	const [documentation, setDocumentation] = useState<string>("");
 
 	useEffect(() => {
-		updateNewDocument({
-			snippet: {
-				language: document.snippet?.language || "typescript",
-				code: document.snippet?.code || "",
-			},
-			document: {
-				id: document.id,
-				title: document.title,
-				project_id: document.project_id,
-				content: document.content || "",
-			},
-		});
-
-		updateCode(document.snippet?.code || "");
-		updateDocumentation(document.content || "");
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [document.id]);
+		setCode(document.snippet?.code || "");
+		setDocumentation(document.content || "");
+	}, [document.id, document.snippet?.code, document.content]);
 
 	return (
-		<div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
-			<div className="sm:w-1/2 h-full">
-				<CodeEditor code={code} onGenerate={handleGenerate} isGenerating={isGenerating} />
-			</div>
-
-			<div className="sm:w-1/2 h-full">
-				<DocumentationPanel documentation={documentation} isGenerating={isGenerating} />
-			</div>
-		</div>
+		<CodeAndDocumentationLayout
+			document={document}
+			code={code}
+			documentation={documentation}
+			onCodeChange={setCode}
+			onDocumentationChange={setDocumentation}
+		/>
 	);
 };

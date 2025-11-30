@@ -16,7 +16,7 @@ export interface Document {
 
 export type GetDocumentDto = Omit<Document, "created_at" | "snippet_id">;
 
-export type GenerateDocumentation = {
+export type GenerateSnippetDocumentation = {
 	snippet: {
 		language: string;
 		code: string;
@@ -28,13 +28,10 @@ export type GenerateDocumentation = {
 };
 
 export type CreateDocument = {
-	snippet: {
-		language: string;
-		code: string;
-	};
-	document: {
-		title: string;
-		project_id: number;
-		content: string;
-	};
+	title: string;
+	project_id: number;
+	content?: string;
+	snippet_id?: number;
 };
+
+export type UpdateDocument = Partial<CreateDocument>;

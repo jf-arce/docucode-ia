@@ -1,15 +1,12 @@
 "use client";
-import { useEffect } from "react";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GetProjectDto } from "@/types/project.types";
-import { useWorkspace } from "@/context/WorkspaceContext";
-import { UserProject } from "./UserProject";
-import { NewProjectButton } from "./NewProjectButton";
-import { SidebarUserMenu } from "./SidebarUserMenu";
-import { Code2, PanelLeftIcon } from "lucide-react";
+import { UserProject } from "@/components/UserProject";
+import { NewProjectButton } from "@/components/NewProjectButton";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { Code2, PanelLeftIcon, ChevronDown } from "lucide-react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -24,28 +21,23 @@ import {
 	SidebarTrigger,
 	SidebarFooter,
 } from "@/components/ui/sidebar";
+import { GithubRepositoryDoc } from "@/types/github-repository-docs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { UserRepoDoc } from "@/components/UserRepoDoc";
 
 interface ProjectsSidebarProps {
 	user: User;
 	userProjectsData: GetProjectDto[];
+	userRepoDocsData: GithubRepositoryDoc[];
 }
 
-export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps) {
-	const router = useRouter();
+export function ProjectsSidebar({
+	user,
+	userProjectsData,
+	userRepoDocsData,
+}: ProjectsSidebarProps) {
 	const isMobile = useIsMobile();
-	const { newDocument } = useWorkspace();
 	const { toggleSidebar, open } = useSidebar();
-
-	// Refrescar la página cuando se guarda un documento
-	useEffect(() => {
-		if (newDocument.document.id && newDocument.document.title && typeof window !== "undefined") {
-			const timeoutId = setTimeout(() => {
-				router.refresh();
-			}, 500);
-
-			return () => clearTimeout(timeoutId);
-		}
-	}, [newDocument.document.id, newDocument.document.title, router]);
 
 	return (
 		<Sidebar collapsible="icon">
@@ -72,20 +64,50 @@ export function ProjectsSidebar({ user, userProjectsData }: ProjectsSidebarProps
 			</SidebarHeader>
 
 			<SidebarContent className="overflow-hidden">
-				<SidebarGroup>
-					<SidebarGroupLabel className="text-sm font-medium">Projects</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<NewProjectButton />
-							</SidebarMenuItem>
+				<Collapsible defaultOpen className="group/collapsible">
+					<SidebarGroup>
+						<SidebarGroupLabel asChild>
+							<CollapsibleTrigger>
+								Projects
+								<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
 
-							{userProjectsData.map((project) => (
-								<UserProject key={project.id} project={project} />
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarMenuItem>
+										<NewProjectButton />
+									</SidebarMenuItem>
+
+									{userProjectsData.map((project) => (
+										<UserProject key={project.id} project={project} />
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
+
+				<Collapsible defaultOpen className="group/collapsible">
+					<SidebarGroup>
+						<SidebarGroupLabel asChild>
+							<CollapsibleTrigger>
+								Repositories
+								<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									{userRepoDocsData.map((repoDoc) => (
+										<UserRepoDoc key={repoDoc.id} repoDoc={repoDoc} />
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
 			</SidebarContent>
 
 			{!isMobile && (
