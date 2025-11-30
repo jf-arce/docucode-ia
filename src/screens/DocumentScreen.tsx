@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useWorkspace } from "@/context/WorkspaceContext";
+import { useEffect, useState } from "react";
 import { Document } from "@/types/document.types";
 import { CodeAndDocumentationLayout } from "@/components/CodeAndDocumentationLayout";
 
@@ -10,14 +9,21 @@ interface DocumentScreenProps {
 }
 
 export const DocumentScreen = ({ document }: DocumentScreenProps) => {
-	const { updateCode, updateDocumentation } = useWorkspace();
+	const [code, setCode] = useState<string>("");
+	const [documentation, setDocumentation] = useState<string>("");
 
 	useEffect(() => {
-		updateCode(document.snippet?.code || "");
-		updateDocumentation(document.content || "");
+		setCode(document.snippet?.code || "");
+		setDocumentation(document.content || "");
+	}, [document.id, document.snippet?.code, document.content]);
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [document.id]);
-
-	return <CodeAndDocumentationLayout document={document} />;
+	return (
+		<CodeAndDocumentationLayout
+			document={document}
+			code={code}
+			documentation={documentation}
+			onCodeChange={setCode}
+			onDocumentationChange={setDocumentation}
+		/>
+	);
 };

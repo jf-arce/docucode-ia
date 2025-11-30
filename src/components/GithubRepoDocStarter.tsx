@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
 import { getUserRepositories } from "@/services/get-user-repositories";
 import { createGithubRepositoryDoc } from "@/data/github-repository-doc/create-github-repository-doc";
-import { useWorkspace } from "@/context/WorkspaceContext";
+
 import { generateGitHubRepositoryDocumentation } from "@/services/generate-github-documentation";
 import { updateGithubRepositoryDoc } from "@/data/github-repository-doc/update-github-repository-doc";
 import { Input } from "./ui/input";
@@ -25,7 +25,6 @@ export const GithubRepoDocStarter = () => {
 
 	const [repositoriesLoading, setRepositoriesLoading] = useState(true);
 	const [createRepoDocLoading, setCreateRepoDocLoading] = useState(false);
-	const { updateRepoDoc } = useWorkspace();
 
 	useEffect(() => {
 		getUserRepositories()
@@ -39,8 +38,6 @@ export const GithubRepoDocStarter = () => {
 			setCreateRepoDocLoading(true);
 			const repoDoc = await createGithubRepositoryDoc(repoSelected);
 			if (!repoDoc) return;
-
-			updateRepoDoc(repoDoc);
 
 			router.push(`/workspace/repo/${repoDoc.id}`);
 

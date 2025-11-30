@@ -13,7 +13,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { useWorkspace } from "@/context/WorkspaceContext";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "./ui/button";
 import { GetProjectDto } from "@/types/project.types";
@@ -27,7 +27,6 @@ interface NewDocumentButtonProps {
 export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 	const [isDialogOpen, setIsDialogOpen] = useState<{ [key: number]: boolean }>({});
 	const { toggleSidebar } = useSidebar();
-	const { updateCode, updateDocumentation } = useWorkspace();
 
 	const isMobile = useIsMobile();
 	const router = useRouter();
@@ -59,9 +58,6 @@ export const NewDocumentButton = ({ project }: NewDocumentButtonProps) => {
 			});
 			return;
 		}
-
-		updateCode("");
-		updateDocumentation("");
 
 		router.push(`/workspace/p-${document.project_id}/d/${document.id}`);
 

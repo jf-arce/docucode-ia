@@ -1,4 +1,3 @@
-import { useWorkspace } from "@/context/WorkspaceContext";
 import { generateSnippetDocumentation } from "@/services/generate-snippet-documentation";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -9,9 +8,16 @@ import { Document } from "@/types/document.types";
  * Custom hook to fetch and generate documentation for the current code snippet.
  */
 
-export const useGenerateSnippetDocumentation = ({ document }: { document: Document }) => {
+export const useGenerateSnippetDocumentation = ({
+	document,
+	code,
+	onUpdateDocumentation,
+}: {
+	document: Document;
+	code: string;
+	onUpdateDocumentation: (doc: string) => void;
+}) => {
 	const [isGenerating, setIsGenerating] = useState(false);
-	const { code, updateDocumentation } = useWorkspace();
 
 	const handleGenerate = async () => {
 		if (!code.trim()) {
@@ -31,7 +37,7 @@ export const useGenerateSnippetDocumentation = ({ document }: { document: Docume
 				document: { title: document.title, language: "en" },
 			});
 
-			updateDocumentation(documentation);
+			onUpdateDocumentation(documentation);
 
 			if (!document.id) {
 				return;
