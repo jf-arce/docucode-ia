@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { GithubRepositoryDoc } from "@/types/github-repository-docs";
 import { createClient } from "@/utils/supabase/server";
-import { Sparkles } from "lucide-react";
 import { DocumentationPanel } from "@/components/DocumentationPanel";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { RepoDocStatusChecker } from "@/components/RepoDocStatusChecker";
+import { RegenerateGithubRepoDocButton } from "@/components/RegenerateGithubRepoDocButton";
 
 interface DocumentPageProps {
 	params: Promise<{ repoId: string }>;
@@ -45,13 +44,7 @@ export default async function RepoDocPreviewPage({ params }: DocumentPageProps) 
 					</Link>
 					<h1 className="text-xl font-bold tracking-tight">Documentation of {repoDoc.repo_name}</h1>
 				</div>
-
-				<form action={`/docs/${repoId}/document`} method="POST">
-					<Button type="submit" variant="default" className="gap-2">
-						<Sparkles className="h-4 w-4" />
-						Regenerate Documentation
-					</Button>
-				</form>
+				<RegenerateGithubRepoDocButton repoDoc={repoDoc} />
 			</header>
 
 			<main className="flex flex-1 overflow-hidden">
