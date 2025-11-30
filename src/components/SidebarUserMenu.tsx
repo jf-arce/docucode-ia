@@ -14,7 +14,7 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useRouter } from "next/navigation";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
-import { LogOut, ChevronUp, User2, Sun, Moon, Computer, HomeIcon } from "lucide-react";
+import { LogOut, ChevronUp, User2, Sun, Moon, Computer, HomeIcon, Languages } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -27,10 +27,17 @@ export const SidebarUserMenu = ({ user }: SidebarUserMenuProps) => {
 	const { theme, setTheme } = useTheme();
 	const { open } = useSidebar();
 	const [mounted, setMounted] = useState(false);
+	const [language, setLanguage] = useState(() => {
+		return localStorage.getItem("doc-language") || "English";
+	});
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
+
+	useEffect(() => {
+		localStorage.setItem("doc-language", language);
+	}, [language]);
 
 	const handleLogout = async () => {
 		await createClient()
@@ -78,12 +85,35 @@ export const SidebarUserMenu = ({ user }: SidebarUserMenuProps) => {
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 
-					<Link href="/">
-						<DropdownMenuItem className="cursor-pointer">
-							<HomeIcon className="h-4 w-4" />
-							<span>Home</span>
-						</DropdownMenuItem>
-					</Link>
+
+
+					<DropdownMenuItem asChild className="cursor-pointer">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="relative w-full justify-start px-2"
+								>
+									{language === "English" && <span className="fi fi-us fis rounded-full"></span>}
+									{language === "Spanish" && <span className="fi fi-es fis rounded-full"></span>}
+
+									<span className="font-normal">Doc Language</span>
+								</Button>
+							</DropdownMenuTrigger>
+
+							<DropdownMenuContent align="end" side="right">
+								<DropdownMenuItem onClick={() => setLanguage("English")}>
+									<span className="fi fi-us fis rounded-full"></span>
+									<span>English</span>
+								</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => setLanguage("Spanish")}>
+									<span className="fi fi-es fis rounded-full"></span>
+									<span>Spanish</span>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</DropdownMenuItem>
 
 					{mounted && (
 						<DropdownMenuItem asChild className="cursor-pointer">
@@ -119,6 +149,13 @@ export const SidebarUserMenu = ({ user }: SidebarUserMenuProps) => {
 							</DropdownMenu>
 						</DropdownMenuItem>
 					)}
+
+					<Link href="/">
+						<DropdownMenuItem className="cursor-pointer">
+							<HomeIcon className="h-4 w-4" />
+							<span>Home</span>
+						</DropdownMenuItem>
+					</Link>
 
 					<DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
 						<LogOut className="h-4 w-4" />

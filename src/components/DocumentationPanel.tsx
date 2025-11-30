@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download, FileText, FileCode, Globe } from "lucide-react";
+import { Download, FileText, FileCode, Globe, ChevronDown } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { Loader2 } from "./Loader";
+
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,9 +23,11 @@ import html2pdf from "html2pdf.js";
 interface DocumentationPanelProps {
 	documentation: string;
 	isGenerating: boolean;
+	doc_language: string;
+	onLanguageChange: (language: string) => void;
 }
 
-export function DocumentationPanel({ documentation, isGenerating }: DocumentationPanelProps) {
+export function DocumentationPanel({ documentation, isGenerating, doc_language, onLanguageChange }: DocumentationPanelProps) {
 	const handleExport = (format: string) => {
 		if (!documentation) {
 			toast.error("No documentation to export", {
@@ -222,33 +225,64 @@ export function DocumentationPanel({ documentation, isGenerating }: Documentatio
 				<h2 className="font-mono text-sm font-medium text-foreground">
 					Generated Documentation: {document.title}
 				</h2>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							size="sm"
-							className="h-8 gap-2 bg-transparent"
-							disabled={!documentation || isGenerating}
-						>
-							<Download className="h-3.5 w-3.5" />
-							Export
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => handleExport("markdown")}>
-							<FileText className="mr-2 h-4 w-4" />
-							Markdown
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleExport("pdf")}>
-							<FileCode className="mr-2 h-4 w-4" />
-							PDF
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleExport("html")}>
-							<Globe className="mr-2 h-4 w-4" />
-							HTML
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<div className="flex items-center gap-2">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-8 gap-2 bg-transparent"
+							>
+								<span className="text-base">
+									{doc_language === "English" ? <span className="fi fi-us fis rounded-full"></span> : <span className="fi fi-es fis rounded-full"></span>}
+								</span>
+								<ChevronDown className="h-3.5 w-3.5" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start">
+							<DropdownMenuItem onClick={() => onLanguageChange("English")}>
+								<div className="flex items-center gap-2">
+									<span className="fi fi-us fis rounded-full"></span>
+									<span>English</span>
+								</div>
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => onLanguageChange("Spanish")}>
+								<div className="flex items-center gap-2">
+									<span className="fi fi-es fis rounded-full"></span>
+									<span>Spanish</span>
+								</div>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+					<DropdownMenu>
+
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-8 gap-2 bg-transparent"
+								disabled={!documentation || isGenerating}
+							>
+								<Download className="h-3.5 w-3.5" />
+								Export
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => handleExport("markdown")}>
+								<FileText className="mr-2 h-4 w-4" />
+								Markdown
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleExport("pdf")}>
+								<FileCode className="mr-2 h-4 w-4" />
+								PDF
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => handleExport("html")}>
+								<Globe className="mr-2 h-4 w-4" />
+								HTML
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			<div className="flex-1 bg-editor-bg">

@@ -12,6 +12,7 @@ interface DocumentState {
 		title: string;
 		project_id: number;
 		content?: string;
+		doc_language?: string;
 	};
 }
 
@@ -19,9 +20,11 @@ interface WorkspaceState {
 	newDocument: DocumentState;
 	code: string;
 	documentation: string;
+	docLanguage: string;
 	updateNewDocument: (doc: DocumentState) => void;
 	updateCode: (code: string) => void;
 	updateDocumentation: (doc: string) => void;
+	updateDocLanguage: (language: string) => void;
 	resetNewDocument: () => void;
 }
 
@@ -41,9 +44,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
 	const [code, setCode] = useState<string>("");
 	const [documentation, setDocumentation] = useState("");
+	const [docLanguage, setDocLanguage] = useState("English");
 
 	const updateNewDocument = (doc: DocumentState) => {
 		setNewDocument(doc);
+		// Si el documento tiene un idioma, actualizarlo
+		if (doc.document.doc_language) {
+			setDocLanguage(doc.document.doc_language);
+		}
 	};
 
 	const updateCode = (code: string) => {
@@ -52,6 +60,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
 	const updateDocumentation = (doc: string) => {
 		setDocumentation(doc);
+	};
+
+	const updateDocLanguage = (language: string) => {
+		setDocLanguage(language);
 	};
 
 	const resetNewDocument = () => {
@@ -69,6 +81,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 		});
 		setCode("");
 		setDocumentation("");
+		setDocLanguage("English");
 	};
 
 	return (
@@ -78,8 +91,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 				updateNewDocument,
 				code,
 				documentation,
+				docLanguage,
 				updateCode,
 				updateDocumentation,
+				updateDocLanguage,
 				resetNewDocument,
 			}}
 		>

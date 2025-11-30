@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { Code2Icon } from "lucide-react";
 
 export default function WorkspacePage() {
-	const { newDocument, code, documentation, resetNewDocument } = useWorkspace();
+	const { newDocument, code, documentation, docLanguage, resetNewDocument, updateDocLanguage } = useWorkspace();
 	const { isGenerating, handleGenerate } = useGenerateDocumentation();
 
 	useEffect(() => {
