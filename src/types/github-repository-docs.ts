@@ -8,3 +8,8 @@ export type GithubRepositoryDoc = {
 	created_at: string;
 	updated_at: string;
 };
+
+export type UpdateGithubRepositoryDoc = Omit<
+	Partial<GithubRepositoryDoc>,
+	"created_at" | "updated_at"
+>;

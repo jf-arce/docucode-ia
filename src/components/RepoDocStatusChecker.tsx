@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { RepoDocLoader } from "@/components/RepoDocLoader";
 import { GithubRepositoryDoc } from "@/types/github-repository-docs";
-import { DocumentationPanel } from "@/components/DocumentationPanel";
+import { useRouter } from "next/navigation";
 
 interface RepoDocStatusCheckerProps {
 	initialDoc: GithubRepositoryDoc;
@@ -16,6 +16,7 @@ export function RepoDocStatusChecker({ initialDoc }: RepoDocStatusCheckerProps) 
 	const [repoDoc, setRepoDoc] = useState(initialDoc);
 	const [isPolling, setIsPolling] = useState(true);
 	const supabase = createClient();
+	const router = useRouter();
 
 	useEffect(() => {
 		const checkStatus = async () => {
@@ -38,6 +39,8 @@ export function RepoDocStatusChecker({ initialDoc }: RepoDocStatusCheckerProps) 
 					documentation: data.documentation,
 				}));
 				setIsPolling(false);
+
+				router.refresh();
 			}
 		};
 
@@ -46,11 +49,7 @@ export function RepoDocStatusChecker({ initialDoc }: RepoDocStatusCheckerProps) 
 
 			return () => clearInterval(intervalId);
 		}
-	}, [isPolling, repoDoc.id, supabase]);
+	}, [isPolling, repoDoc.id, supabase, router]);
 
-	if (!repoDoc.is_generated) {
-		return <RepoDocLoader githubRepositoryDoc={repoDoc} />;
-	}
-
-	return <DocumentationPanel documentation={repoDoc.documentation || ""} isGenerating={false} />;
+	return <RepoDocLoader githubRepositoryDoc={repoDoc} />;
 }

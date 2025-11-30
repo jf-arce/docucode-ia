@@ -12,6 +12,8 @@ import { UserGithubRepositoryResponse } from "@/types/user-github-repository-res
 import { getUserRepositories } from "@/services/get-user-repositories";
 import { createGithubRepositoryDoc } from "@/data/github-repository-doc/create-github-repository-doc";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { generateGitHubRepositoryDocumentation } from "@/services/generate-github-documentation";
+import { updateGithubRepositoryDoc } from "@/data/github-repository-doc/update-github-repository-doc";
 
 export const EmptyWorkspace = () => {
 	const router = useRouter();
@@ -41,6 +43,14 @@ export const EmptyWorkspace = () => {
 			updateRepoDoc(repoDoc);
 
 			router.push(`/workspace/repo/${repoDoc.id}`);
+
+			generateGitHubRepositoryDocumentation(repoSelected.html_url)
+				.then(async (documentation) => {
+					await updateGithubRepositoryDoc(repoDoc.id, { documentation, is_generated: true });
+				})
+				.catch((err) => {
+					console.error("Error generating documentation", err);
+				});
 		} else {
 			console.log(urlSelected);
 		}
