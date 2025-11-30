@@ -1,11 +1,14 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import html2pdf from "html2pdf.js";
 import "github-markdown-css/github-markdown.css";
 
 export const exportAsPDF = async (content: string, filename: string) => {
-	// Convertir Markdown a HTML usando ReactMarkdown de manera temporal
+	if (typeof window === "undefined") return;
+
+	const html2pdf = (await import("html2pdf.js")).default;
+
+	// Contenedor temporal
 	const tempContainer = document.createElement("div");
 	tempContainer.style.padding = "30px";
 	tempContainer.style.maxWidth = "800px";
@@ -14,23 +17,18 @@ export const exportAsPDF = async (content: string, filename: string) => {
 	tempContainer.style.backgroundColor = "#ffffff";
 	tempContainer.style.color = "#111827";
 	tempContainer.innerHTML = `
-		<h1 style="text-align:center; font-size: 22px; border-bottom: 2px solid #007acc; padding-bottom: 10px;">Code Documentation</h1>
-		<div id="markdown-content"></div>
-	`;
-
+    <h1 style="text-align:center; font-size: 22px; border-bottom: 2px solid #007acc; padding-bottom: 10px;">Code Documentation</h1>
+    <div id="markdown-content"></div>
+  `;
 	document.body.appendChild(tempContainer);
 
+	// Generar HTML de Markdown
 	const { renderToString } = await import("react-dom/server");
-
 	const html = renderToString(
 		<ReactMarkdown
 			remarkPlugins={[remarkGfm]}
 			components={{
-				code({
-					className,
-					children,
-					...props
-				}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) {
+				code({ className, children, ...props }) {
 					const match = /language-(\w+)/.exec(className || "");
 					const isInline = !(className && className.includes("language-"));
 					return !isInline && match ? (
@@ -66,7 +64,6 @@ export const exportAsPDF = async (content: string, filename: string) => {
 		</ReactMarkdown>,
 	);
 
-	// Insertamos el HTML generado en el contenedor
 	const markdownContainer = tempContainer.querySelector("#markdown-content");
 	if (markdownContainer) markdownContainer.innerHTML = html;
 
@@ -82,7 +79,5 @@ export const exportAsPDF = async (content: string, filename: string) => {
 		.set(opt)
 		.from(tempContainer)
 		.save()
-		.then(() => {
-			document.body.removeChild(tempContainer);
-		});
+		.then(() => document.body.removeChild(tempContainer));
 };
