@@ -7,7 +7,8 @@ export async function getProjectsData(userId: string): Promise<GetProjectDto[]> 
 		.from("projects")
 		.select("*, documents:documents_project_id_fkey(*, snippet:snippets(*))")
 		.eq("user_id", userId)
-		.order("created_at", { ascending: false });
+		.order("created_at", { ascending: false })
+		.order("created_at", { referencedTable: "documents", ascending: false });
 
 	if (error) {
 		console.error("Error fetching projects:", error);
