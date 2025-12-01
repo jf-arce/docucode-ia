@@ -5,7 +5,8 @@ export const getGithubRepositoryDocsByUser = async (userId: string) => {
 	const { data, error } = await supabase
 		.from("github_repository_docs")
 		.select("*")
-		.eq("user_id", userId);
+		.eq("user_id", userId)
+		.order("created_at", { ascending: false });
 
 	if (error) return [];
 
