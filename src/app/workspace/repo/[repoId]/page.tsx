@@ -1,11 +1,11 @@
 import { GithubRepositoryDoc } from "@/types/github-repository-docs";
 import { createClient } from "@/utils/supabase/server";
-import { DocumentationPanel } from "@/components/DocumentationPanel";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { RepoDocStatusChecker } from "@/components/RepoDocStatusChecker";
 import { RegenerateGithubRepoDocButton } from "@/components/RegenerateGithubRepoDocButton";
+import { RepoDocumentationViewer } from "@/components/RepoDocumentationViewer";
 
 interface DocumentPageProps {
 	params: Promise<{ repoId: string }>;
@@ -49,7 +49,11 @@ export default async function RepoDocPreviewPage({ params }: DocumentPageProps) 
 
 			<main className="flex flex-1 overflow-hidden">
 				<div className="flex-1 overflow-y-auto">
-					<DocumentationPanel documentation={documentationContent} isGenerating={false} />
+					<RepoDocumentationViewer
+						documentation={documentationContent}
+						doc_language={repoDoc.doc_language}
+						repoId={repoDoc.id}
+					/>
 				</div>
 			</main>
 		</div>

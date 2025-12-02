@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
         --- METADATA ---
         - Snippet Language: ${snippetLanguage}
-        - Target Language for Documentation: ${docLanguage || "English"}
+        - Target Language for Documentation: ${docLanguage}
 
         --- CODE SNIPPET ---
         \`\`\`${snippetLanguage}

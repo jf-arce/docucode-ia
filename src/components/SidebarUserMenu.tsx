@@ -1,3 +1,5 @@
+"use client"
+
 import { User } from "@supabase/supabase-js";
 import {
 	DropdownMenu,
@@ -27,17 +29,22 @@ export const SidebarUserMenu = ({ user }: SidebarUserMenuProps) => {
 	const { theme, setTheme } = useTheme();
 	const { open } = useSidebar();
 	const [mounted, setMounted] = useState(false);
-	const [language, setLanguage] = useState(() => {
-		return localStorage.getItem("doc-language") || "English";
-	});
+	const [language, setLanguage] = useState("English");
 
 	useEffect(() => {
 		setMounted(true);
+		// Cargar el idioma desde localStorage después del montaje
+		const savedLanguage = localStorage.getItem("doc-language");
+		if (savedLanguage) {
+			setLanguage(savedLanguage);
+		}
 	}, []);
 
 	useEffect(() => {
-		localStorage.setItem("doc-language", language);
-	}, [language]);
+		if (mounted) {
+			localStorage.setItem("doc-language", language);
+		}
+	}, [language, mounted]);
 
 	const handleLogout = async () => {
 		await createClient()

@@ -59,21 +59,32 @@ const DEFAULT_LANGUAGE = "typescript";
 export function CodeEditor({ code, onCodeChange, onGenerate, isGenerating }: CodeEditorProps) {
 	const currentTheme = useTheme();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [mounted, setMounted] = useState(false);
 
-	const [codeEditorTheme, setCodeEditorTheme] = useState(() => {
-		return localStorage.getItem("editor-theme") || DEFAULT_THEME;
-	});
-	const [language, setLanguage] = useState(() => {
-		return localStorage.getItem("editor-language") || DEFAULT_LANGUAGE;
-	});
+	const [codeEditorTheme, setCodeEditorTheme] = useState(DEFAULT_THEME);
+	const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
 	useEffect(() => {
-		localStorage.setItem("editor-language", language);
-	}, [language]);
+		setMounted(true);
+		// Cargar valores desde localStorage después del montaje
+		const savedTheme = localStorage.getItem("editor-theme");
+		const savedLanguage = localStorage.getItem("editor-language");
+
+		if (savedTheme) setCodeEditorTheme(savedTheme);
+		if (savedLanguage) setLanguage(savedLanguage);
+	}, []);
 
 	useEffect(() => {
-		localStorage.setItem("editor-theme", codeEditorTheme);
-	}, [codeEditorTheme]);
+		if (mounted) {
+			localStorage.setItem("editor-language", language);
+		}
+	}, [language, mounted]);
+
+	useEffect(() => {
+		if (mounted) {
+			localStorage.setItem("editor-theme", codeEditorTheme);
+		}
+	}, [codeEditorTheme, mounted]);
 
 	const handleChange = (value: string) => {
 		onCodeChange(value);

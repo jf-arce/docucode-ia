@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Download, FileText, FileCode, Globe, ChevronDown } from "lucide-react";
+import { DocLanguage } from "@/enums/doc-language";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -84,19 +85,19 @@ export function DocumentationPanel({ documentation, isGenerating, doc_language, 
 								className="h-8 gap-2 bg-transparent"
 							>
 								<span className="text-base">
-									{doc_language === "English" ? <span className="fi fi-us fis rounded-full"></span> : <span className="fi fi-es fis rounded-full"></span>}
+									{doc_language === DocLanguage.English ? <span className="fi fi-us fis rounded-full"></span> : <span className="fi fi-es fis rounded-full"></span>}
 								</span>
 								<ChevronDown className="h-3.5 w-3.5" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start">
-							<DropdownMenuItem onClick={() => onLanguageChange("English")}>
+							<DropdownMenuItem onClick={() => onLanguageChange(DocLanguage.English)}>
 								<div className="flex items-center gap-2">
 									<span className="fi fi-us fis rounded-full"></span>
 									<span>English</span>
 								</div>
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => onLanguageChange("Spanish")}>
+							<DropdownMenuItem onClick={() => onLanguageChange(DocLanguage.Spanish)}>
 								<div className="flex items-center gap-2">
 									<span className="fi fi-es fis rounded-full"></span>
 									<span>Spanish</span>
