@@ -5,24 +5,14 @@ export async function GET() {
 	const supabase = await createClient();
 
 	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+		data: { session },
+	} = await supabase.auth.getSession();
 
-	if (!user) {
-		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	if (!session?.provider_token) {
+		return NextResponse.json({ error: "Unauthorized or missing GitHub token" }, { status: 401 });
 	}
 
-	const { data: userProfile } = await supabase
-		.from("user_profiles")
-		.select("github_token")
-		.eq("user_id", user.id)
-		.single();
-
-	const tokenToUse = userProfile?.github_token;
-
-	if (!tokenToUse) {
-		return NextResponse.json({ error: "Missing GitHub token" }, { status: 401 });
-	}
+	const tokenToUse = session.provider_token;
 
 	const res = await fetch("https://api.github.com/user/repos?type=owner", {
 		headers: { Authorization: `Bearer ${tokenToUse}` },

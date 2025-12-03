@@ -146,8 +146,8 @@ export function DocumentationPanel({ documentation, isGenerating, doc_language, 
 					</div>
 				) : documentation ? (
 					<div
-						className="markdown-body h-full p-4 w-full overflow-auto text-sm leading-relaxed"
-						style={{ backgroundColor: "transparent" }}
+						className="markdown-body h-full w-full p-4 overflow-auto text-sm leading-relaxed"
+						style={{ backgroundColor: "transparent", color: "var(--foreground)" }}
 					>
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}

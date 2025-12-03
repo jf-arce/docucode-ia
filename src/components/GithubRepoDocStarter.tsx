@@ -68,7 +68,7 @@ export const GithubRepoDocStarter = () => {
 			<GitHubIcon size={48} />
 			<h2 className="text-xl font-medium">Document your code from GitHub</h2>
 			<Tabs defaultValue="github" className="bg-background/80 p-4 rounded-lg">
-				<TabsList className="flex justify-center bg-black w-full">
+				<TabsList className="flex justify-center dark:bg-black/60 bg-gray-200/60 w-full">
 					<TabsTrigger value="github" asChild onClick={() => setSelectedTab("github")}>
 						<div>
 							<GitHubIcon size={24} />
