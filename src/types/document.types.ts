@@ -9,6 +9,7 @@ export interface Document {
 	created_at: string;
 	title: string;
 	content: string;
+	doc_language: string;
 	project_id: number;
 	snippet_id: number;
 	snippet?: Snippet;
@@ -32,6 +33,7 @@ export type CreateDocument = {
 	project_id: number;
 	content?: string;
 	snippet_id?: number;
+	doc_language?: string;
 };
 
 export type UpdateDocument = Partial<CreateDocument>;

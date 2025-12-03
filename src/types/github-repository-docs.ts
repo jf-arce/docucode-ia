@@ -4,6 +4,7 @@ export type GithubRepositoryDoc = {
 	repo_name: string;
 	documentation: string | null;
 	is_generated: boolean;
+	doc_language: string;
 	user_id: string;
 	created_at: string;
 	updated_at: string;

@@ -16,6 +16,10 @@ const eslintConfig = [
 		rules: {
 			// ... otras reglas
 			"@typescript-eslint/no-empty-object-type": "off",
+			"@typescript-eslint/ban-ts-comment": "off",
+			"@typescript-eslint/triple-slash-reference": "off",
+			"@typescript-eslint/no-unused-vars": "warn",
+			"react/no-unescaped-entities": "off",
 		},
 	},
 ];

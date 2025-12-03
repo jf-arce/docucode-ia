@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Download, FileText, FileCode, Globe, ChevronDown } from "lucide-react";
+import { DocLanguage } from "@/enums/doc-language";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -84,7 +85,7 @@ export function DocumentationPanel({
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" size="sm" className="h-8 gap-2 bg-transparent">
 								<span className="text-base">
-									{doc_language === "English" ? (
+									{doc_language === DocLanguage.English ? (
 										<span className="fi fi-us fis rounded-full"></span>
 									) : (
 										<span className="fi fi-es fis rounded-full"></span>
@@ -94,13 +95,13 @@ export function DocumentationPanel({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start">
-							<DropdownMenuItem onClick={() => onLanguageChange("English")}>
+							<DropdownMenuItem onClick={() => onLanguageChange(DocLanguage.English)}>
 								<div className="flex items-center gap-2">
 									<span className="fi fi-us fis rounded-full"></span>
 									<span>English</span>
 								</div>
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => onLanguageChange("Spanish")}>
+							<DropdownMenuItem onClick={() => onLanguageChange(DocLanguage.Spanish)}>
 								<div className="flex items-center gap-2">
 									<span className="fi fi-es fis rounded-full"></span>
 									<span>Spanish</span>
@@ -148,8 +149,8 @@ export function DocumentationPanel({
 					</div>
 				) : documentation ? (
 					<div
-						className="markdown-body h-full p-4 w-full overflow-auto text-sm leading-relaxed"
-						style={{ backgroundColor: "transparent" }}
+						className="markdown-body h-full w-full p-4 overflow-auto text-sm leading-relaxed"
+						style={{ backgroundColor: "transparent", color: "var(--foreground)" }}
 					>
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}
