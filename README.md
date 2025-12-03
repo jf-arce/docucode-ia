@@ -69,6 +69,8 @@ Desarrollar una plataforma SaaS en la nube que automatice la generación de docu
   - TypeScript, JavaScript, Python, Java, C/C++, C#, Go, Rust, PHP, Ruby, Swift, Kotlin, Lua, SQL, Shell, YAML, JSON, XML, HTML, CSS, y más
 - [x] Selección de temas del editor (One Dark, Dracula, Monokai, GitHub, etc.)
 - [x] Carga de archivos desde el sistema local
+- [x] Carga de archivos desde repositorio de GitHub personales
+- [x] Permite seleccionar idioma particular de cada documentación
 - [x] Generación de documentación estructurada con:
   - Título y overview
   - Explicación de cómo funciona
@@ -174,7 +176,6 @@ src/
 
 ### 🔧 Funcionalidades Adicionales
 
-- [ ] Importar código desde repositorios de GitHub
 - [ ] Templates de documentación personalizables
 - [ ] Integración con CI/CD para documentación automática
 - [ ] API pública para integrar en otros proyectos
