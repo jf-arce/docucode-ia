@@ -27,7 +27,7 @@ interface GitHubTreeResponse {
 
 export async function POST(request: Request) {
 	try {
-		const { repositoryUrl, branch } = await request.json();
+		const { repositoryUrl, docLanguage, branch } = await request.json();
 
 		const { owner, repo, branch: parsedBranch } = parseGitHubUrl(repositoryUrl);
 		const branchToUse = branch ?? parsedBranch;
@@ -75,7 +75,13 @@ export async function POST(request: Request) {
 		const { text: documentation } = await generateText({
 			model,
 			system: systemPrompt,
-			prompt: `Here is the codebase content:\n\n${JSON.stringify(validFiles, null, 2)}`,
+			temperature: 0.2,
+			prompt: `
+				--- METADATA ---
+				- Target Language for Documentation: ${docLanguage}
+				
+				Here is the codebase content:\n\n${JSON.stringify(validFiles, null, 2)}
+				`,
 		});
 
 		return Response.json({ documentation });

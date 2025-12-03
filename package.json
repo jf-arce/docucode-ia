@@ -28,6 +28,7 @@
 		"ai": "^5.0.81",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"flag-icons": "^7.5.0",
 		"cmdk": "^1.1.1",
 		"github-markdown-css": "^5.8.1",
 		"html2pdf.js": "^0.12.1",

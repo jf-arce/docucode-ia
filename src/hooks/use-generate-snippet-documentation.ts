@@ -34,7 +34,7 @@ export const useGenerateSnippetDocumentation = ({
 			setIsGenerating(true);
 			const documentation = await generateSnippetDocumentation({
 				snippet: { language: editorLanguage, code: code },
-				document: { title: document.title, language: "en" },
+				document: { title: document.title, language: document.doc_language || "english" },
 			});
 
 			onUpdateDocumentation(documentation);

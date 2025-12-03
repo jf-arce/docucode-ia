@@ -19,7 +19,10 @@ export const RegenerateGithubRepoDocButton = ({ repoDoc }: { repoDoc: GithubRepo
 		try {
 			await updateGithubRepositoryDoc(repoDoc.id, { is_generated: false });
 			router.refresh();
-			const documentation = await generateGitHubRepositoryDocumentation(html_url);
+			const documentation = await generateGitHubRepositoryDocumentation(
+				html_url,
+				repoDoc.doc_language,
+			);
 			await updateGithubRepositoryDoc(repoDoc.id, { documentation, is_generated: true });
 		} catch (err) {
 			console.error("Error generating documentation", err);

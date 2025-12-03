@@ -1,11 +1,14 @@
 /**
  * Service to generate documentation for a GitHub repository.
  */
-export const generateGitHubRepositoryDocumentation = async (repositoryUrl: string) => {
+export const generateGitHubRepositoryDocumentation = async (
+	repositoryUrl: string,
+	docLanguage: string,
+) => {
 	const res = await fetch("/api/github/generate-repo-documentation", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ repositoryUrl }),
+		body: JSON.stringify({ repositoryUrl, docLanguage }),
 	});
 
 	if (!res.ok) {

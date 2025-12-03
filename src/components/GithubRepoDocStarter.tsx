@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { UserGithubRepositoryResponse } from "@/types/user-github-repository-response";
 import { getUserRepositories } from "@/services/get-user-repositories";
 import { createGithubRepositoryDoc } from "@/data/github-repository-doc/create-github-repository-doc";
-
 import { generateGitHubRepositoryDocumentation } from "@/services/generate-github-documentation";
 import { updateGithubRepositoryDoc } from "@/data/github-repository-doc/update-github-repository-doc";
 import { Input } from "./ui/input";
@@ -22,15 +21,24 @@ export const GithubRepoDocStarter = () => {
 	const [selectedTab, setSelectedTab] = useState<"github" | "url">("github");
 	const [repoSelected, setRepoSelected] = useState<UserGithubRepositoryResponse | null>(null);
 	const [urlSelected, setUrlSelected] = useState<string | null>(null);
-
 	const [repositoriesLoading, setRepositoriesLoading] = useState(true);
 	const [createRepoDocLoading, setCreateRepoDocLoading] = useState(false);
+	const [docLanguage, setDocLanguage] = useState("english");
 
 	useEffect(() => {
 		getUserRepositories()
 			.then((repos) => setUserRepositories(repos))
 			.catch(() => setUserRepositories([]))
 			.finally(() => setRepositoriesLoading(false));
+	}, []);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const savedLanguage = localStorage.getItem("doc-language");
+			if (savedLanguage) {
+				setDocLanguage(savedLanguage.toLowerCase());
+			}
+		}
 	}, []);
 
 	const handleSelectRepo = async () => {
@@ -43,7 +51,7 @@ export const GithubRepoDocStarter = () => {
 
 			setCreateRepoDocLoading(false);
 
-			generateGitHubRepositoryDocumentation(repoSelected.html_url)
+			generateGitHubRepositoryDocumentation(repoSelected.html_url, docLanguage)
 				.then(async (documentation) => {
 					await updateGithubRepositoryDoc(repoDoc.id, { documentation, is_generated: true });
 				})
