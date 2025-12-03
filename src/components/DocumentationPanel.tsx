@@ -11,7 +11,6 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "./Loader";
 
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -28,7 +27,12 @@ interface DocumentationPanelProps {
 	onLanguageChange: (language: string) => void;
 }
 
-export function DocumentationPanel({ documentation, isGenerating, doc_language, onLanguageChange }: DocumentationPanelProps) {
+export function DocumentationPanel({
+	documentation,
+	isGenerating,
+	doc_language,
+	onLanguageChange,
+}: DocumentationPanelProps) {
 	const handleExport = (format: string) => {
 		if (!documentation) {
 			toast.error("No documentation to export", {
@@ -78,13 +82,13 @@ export function DocumentationPanel({ documentation, isGenerating, doc_language, 
 				<div className="flex items-center gap-2">
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button
-								variant="outline"
-								size="sm"
-								className="h-8 gap-2 bg-transparent"
-							>
+							<Button variant="outline" size="sm" className="h-8 gap-2 bg-transparent">
 								<span className="text-base">
-									{doc_language === "English" ? <span className="fi fi-us fis rounded-full"></span> : <span className="fi fi-es fis rounded-full"></span>}
+									{doc_language === "English" ? (
+										<span className="fi fi-us fis rounded-full"></span>
+									) : (
+										<span className="fi fi-es fis rounded-full"></span>
+									)}
 								</span>
 								<ChevronDown className="h-3.5 w-3.5" />
 							</Button>
@@ -105,7 +109,6 @@ export function DocumentationPanel({ documentation, isGenerating, doc_language, 
 						</DropdownMenuContent>
 					</DropdownMenu>
 					<DropdownMenu>
-
 						<DropdownMenuTrigger asChild>
 							<Button
 								variant="outline"
