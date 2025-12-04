@@ -358,7 +358,7 @@ Este proyecto es de uso académico y educativo.
 ## 🔗 Links
 
 - **Repositorio**: [github.com/jf-arce/docucode-ai](https://github.com/jf-arce/docucode-ai)
-- **Demo**: [Próximamente]
+- **Demo**: [Ver video demo](https://drive.google.com/file/d/1HZRJbV8AMVu0ABCTx7cikooZc4ppOIv_/view?usp=drive_web)
 
 ---
 
