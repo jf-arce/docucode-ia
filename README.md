@@ -11,7 +11,7 @@
 
 ## 📋 Descripción del Proyecto
 
-**DocuCode AI** es una aplicación web desarrollada como proyecto de la materia **Desarrollo de Software Cloud** que permite a los desarrolladores generar documentación técnica profesional de manera automática a partir de fragmentos de código.
+**DocuCode AI** es una aplicación web desarrollada como proyecto de la materia **Desarrollo de Software Cloud** que permite a los desarrolladores generar documentación técnica profesional de manera automática a partir de fragmentos de código o **repositorios completos de GitHub**.
 
 La plataforma utiliza **Google Gemini 2.5 Flash** como modelo de IA para analizar el código ingresado y generar documentación estructurada en formato Markdown, siguiendo estándares profesionales de documentación de software.
 
@@ -41,6 +41,51 @@ Desarrollar una plataforma SaaS en la nube que automatice la generación de docu
 
 ## ✅ Funcionalidades Implementadas
 
+### 🐙 Documentación de Repositorios GitHub (Principal)
+
+- [x] **Integración directa con GitHub OAuth** para acceder a los repositorios del usuario autenticado
+- [x] **Selector de repositorios** con búsqueda y filtrado
+- [x] **Documentación por URL pública** de cualquier repositorio de GitHub
+- [x] **Selección de rama (branch)** a documentar
+- [x] **Análisis automático del código fuente**:
+  - Lectura del árbol de archivos del repositorio
+  - Filtrado inteligente de archivos relevantes (código, configuración)
+  - Exclusión de node_modules, dist, lock files, etc.
+- [x] **Restricciones de seguridad y privacidad**:
+  - Solo se accede a archivos de código fuente (extensiones permitidas: `.ts`, `.js`, `.py`, `.go`, `.java`, etc.)
+  - No se almacenan ni procesan datos sensibles del repositorio
+  - El contenido se usa únicamente para generar documentación
+- [x] **Generación de README.md profesional** que incluye:
+  - Portada con badges de tecnologías detectadas
+  - Overview y descripción del proyecto
+  - Features principales
+  - Tech Stack detectado automáticamente
+  - Estructura del proyecto
+  - Arquitectura y flujo de funcionamiento
+  - Documentación de archivos clave
+  - Instrucciones de instalación y uso
+- [x] **Procesamiento en background** con polling de estado
+- [x] **Regeneración de documentación** para actualizar docs existentes
+
+### ✨ Generación de Documentación con IA (Snippets)
+
+- [x] Editor de código con soporte para **25+ lenguajes**:
+  - TypeScript, JavaScript, Python, Java, C/C++, C#, Go, Rust, PHP, Ruby, Swift, Kotlin, Lua, SQL, Shell, YAML, JSON, XML, HTML, CSS, y más
+- [x] Selección de temas del editor (One Dark, Dracula, Monokai, GitHub, etc.)
+- [x] Carga de archivos desde el sistema local
+- [x] **Selección de idioma de documentación**:
+  - El idioma global (Inglés/Español) se selecciona en el menú de usuario y afecta la interfaz y la generación de documentación por defecto para todos los proyectos y documentos nuevos.
+  - El idioma específico se puede elegir por cada documento individual (en el panel de documentación), sobrescribiendo el global solo para ese documento.
+- [x] Generación de documentación estructurada con:
+  - Título y overview
+  - Explicación de cómo funciona
+  - Características principales
+  - Tabla de parámetros de entrada
+  - Descripción de outputs
+  - Ejemplos de uso
+  - Notas y limitaciones
+  - Mejores prácticas
+
 ### 🔐 Sistema de Autenticación
 
 - [x] Login y registro con email/contraseña
@@ -63,24 +108,6 @@ Desarrollar una plataforma SaaS en la nube que automatice la generación de docu
 - [x] Eliminar documentos
 - [x] Guardar snippets de código asociados
 
-### ✨ Generación de Documentación con IA
-
-- [x] Editor de código con soporte para **25+ lenguajes**:
-  - TypeScript, JavaScript, Python, Java, C/C++, C#, Go, Rust, PHP, Ruby, Swift, Kotlin, Lua, SQL, Shell, YAML, JSON, XML, HTML, CSS, y más
-- [x] Selección de temas del editor (One Dark, Dracula, Monokai, GitHub, etc.)
-- [x] Carga de archivos desde el sistema local
-- [x] Carga de archivos desde repositorio de GitHub personales
-- [x] Permite seleccionar idioma particular de cada documentación
-- [x] Generación de documentación estructurada con:
-  - Título y overview
-  - Explicación de cómo funciona
-  - Características principales
-  - Tabla de parámetros de entrada
-  - Descripción de outputs
-  - Ejemplos de uso
-  - Notas y limitaciones
-  - Mejores prácticas
-
 ### 📥 Exportación de Documentación
 
 - [x] Exportar a **Markdown** (.md)
@@ -101,24 +128,30 @@ Desarrollar una plataforma SaaS en la nube que automatice la generación de docu
 
 ### Frontend
 
-| Tecnología                   | Uso                            |
-| ---------------------------- | ------------------------------ |
-| **Next.js 15**               | Framework React con App Router |
-| **TypeScript**               | Tipado estático                |
-| **Tailwind CSS 4**           | Estilos utilitarios            |
-| **Radix UI**                 | Componentes accesibles         |
-| **React Ace**                | Editor de código               |
-| **React Markdown**           | Renderizado de Markdown        |
-| **React Syntax Highlighter** | Resaltado de sintaxis          |
+| Tecnología                   | Uso                              |
+| ---------------------------- | -------------------------------- |
+| **Next.js 15**               | Framework React con App Router   |
+| **TypeScript**               | Tipado estático                  |
+| **Tailwind CSS 4**           | Estilos utilitarios              |
+| **Radix UI**                 | Componentes accesibles           |
+| **React Ace**                | Editor de código                 |
+| **React Markdown**           | Renderizado de Markdown          |
+| **React Syntax Highlighter** | Resaltado de sintaxis            |
+| **cmdk**                     | Combobox de búsqueda             |
+| **Motion (Framer Motion)**   | Animaciones                      |
+| **ldrs**                     | Spinners y loaders animados      |
+| **flag-icons**               | Banderas para selector de idioma |
 
 ### Backend & Cloud
 
-| Tecnología                  | Uso                             |
-| --------------------------- | ------------------------------- |
-| **Supabase**                | Base de datos PostgreSQL + Auth |
-| **Google Gemini 2.5 Flash** | Modelo de IA generativa         |
-| **Vercel AI SDK**           | Integración con modelos de IA   |
-| **Next.js API Routes**      | Endpoints del servidor          |
+| Tecnología                  | Uso                                |
+| --------------------------- | ---------------------------------- |
+| **Supabase**                | Base de datos PostgreSQL + Auth    |
+| **Google Gemini 2.5 Flash** | Modelo de IA generativa            |
+| **Vercel AI SDK**           | Integración con modelos de IA      |
+| **Next.js API Routes**      | Endpoints del servidor             |
+| **GitHub API**              | Acceso a repositorios y contenido  |
+| **p-limit**                 | Control de concurrencia en fetches |
 
 ### Herramientas de Desarrollo
 
@@ -135,20 +168,30 @@ Desarrollar una plataforma SaaS en la nube que automatice la generación de docu
 src/
 ├── actions/           # Server Actions (CRUD de documentos/proyectos)
 ├── app/
-│   ├── api/          # API Routes (generación con IA)
+│   ├── api/
+│   │   ├── generate-document/        # API para documentar snippets
+│   │   └── github/
+│   │       ├── generate-repo-documentation/  # API para documentar repos
+│   │       └── user-repositories/     # API para listar repos del usuario
 │   ├── auth/         # Páginas de autenticación
-│   └── workspace/    # Área de trabajo del usuario
+│   └── workspace/
+│       ├── [projectSlug]/d/[documentId]/  # Vista de documento
+│       └── repo/[repoId]/                 # Vista de doc de repositorio
 ├── components/       # Componentes React reutilizables
 ├── context/          # Context API (WorkspaceContext)
-├── data/             # Funciones de acceso a datos
+├── data/
+│   ├── document/     # Acceso a datos de documentos
+│   ├── github-repository-doc/  # Acceso a datos de docs de GitHub
+│   └── project/      # Acceso a datos de proyectos
 ├── hooks/            # Custom hooks
 ├── lib/              # Utilidades
 ├── screens/          # Pantallas principales
 ├── services/         # Servicios (llamadas a API)
 ├── types/            # Definiciones TypeScript
 └── utils/
-    ├── file-exports/ # Exportación de archivos
-    └── supabase/     # Cliente de Supabase
+    ├── file-exports/            # Exportación de archivos
+    ├── generate-document-github/ # Prompts para docs de GitHub
+    └── supabase/                 # Cliente de Supabase
 ```
 
 ---
@@ -158,9 +201,16 @@ src/
 ### 🔄 Mejoras de IA
 
 - [ ] Soporte para streaming de respuestas (mostrar generación en tiempo real)
-- [ ] Selección de idioma de la documentación generada
 - [ ] Opciones de personalización del estilo de documentación
 - [ ] Historial de versiones de documentación
+- [ ] Traducir documentación ya generada a otro idioma
+
+### 🐙 Mejoras de Integración con GitHub
+
+- [ ] Ocultar opciones de GitHub si el usuario inició sesión con Google
+- [ ] Detectar expiración del token de GitHub y renovarlo automáticamente
+- [ ] Evitar que la UI quede vacía o bloqueada por error 401
+- [ ] Indicador visual de estado en sidebar (punto verde/azul) para documentaciones en proceso o finalizadas
 
 ### 📊 Analytics y Métricas
 
@@ -180,6 +230,7 @@ src/
 - [ ] Integración con CI/CD para documentación automática
 - [ ] API pública para integrar en otros proyectos
 - [ ] Modo offline con sincronización
+- [ ] Soporte para repositorios privados mediante GitHub App
 
 ### 💰 Monetización
 
@@ -209,6 +260,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
 
 # Google Gemini AI
 GOOGLE_GENERATIVE_AI_API_KEY=tu_api_key_de_gemini
+
+# GitHub (para acceso a repositorios públicos)
+GITHUB_TOKEN=tu_github_token_opcional
 ```
 
 ### Instalación
@@ -266,6 +320,18 @@ documents (
   project_id: uuid REFERENCES projects,
   snippet_id: uuid REFERENCES snippets,
   created_at: timestamp
+)
+
+-- Tabla de documentación de repositorios GitHub
+github_repository_docs (
+  id: uuid PRIMARY KEY,
+  repo_owner: varchar,
+  repo_name: varchar,
+  documentation: text,
+  is_generated: boolean DEFAULT false,
+  user_id: uuid REFERENCES auth.users,
+  created_at: timestamp,
+  updated_at: timestamp
 )
 ```
 
